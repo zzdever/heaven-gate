@@ -7,7 +7,7 @@
 #include <QGLWidget>
 #include <GLUT/glut.h>
 
-#include "glfunction.h"
+#include "misc.h"
 
 
 class GLWidget : public QGLWidget
@@ -49,6 +49,8 @@ private:
     GLuint textures[6];
     QVector<QVector3D> vertices;
     QVector<QVector2D> texCoords;
+
+    bool isGLWidgetFocued;
 
 
 };

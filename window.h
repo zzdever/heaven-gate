@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+#include "misc.h"
+
 class GLWidget;
 
 class Window : public QWidget

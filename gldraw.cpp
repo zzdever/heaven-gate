@@ -1,4 +1,5 @@
-#include "glfunction.h"
+#include "misc.h"
+#include "gldraw.h"
 
 #define TABLE 0
 #define TEX 1
@@ -12,14 +13,30 @@
 #define CRACK "/Users/ying/Crack.bmp"
 #define SPOT "/Users/ying/Spot.bmp"
 #define MONET "/Users/ying/Monet.bmp"
+#define NIGHTSKY "/Users/ying/nightsky.bmp"
 //==========================================
 
 #define BMP_Header_Length 54
+
+#define EYE_ROTATION_COEFFICIENT 0.05
+#define EYE_STEP_COEFFICIENT 0.05
+
+
 
 GLuint texCrack;
 GLuint texSpot;
 GLuint texMonet;
 GLuint texCustom;
+GLuint texNightSky;
+
+
+float eye[] = {0, 0, 8};
+float eye_center[] = {0, 0, 0};
+float eye_theta[] = {0, 0};
+
+
+
+
 
 
 // judge whether n is a number of power of 2
@@ -330,6 +347,51 @@ void glutSolidCube(GLdouble size)
 }
 
 
+void DrawCone(float x, float y, float z)
+{
+    glutSolidCone(0.5, 0.7, 10, 10);
+}
+
+
+void DrawSky()
+{
+
+
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CW);
+    //glCullFace(GL_BACK);
+
+    glPushMatrix();
+    glLoadIdentity();
+
+    glBindTexture(GL_TEXTURE_2D, texNightSky);
+
+    glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+    glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+
+
+    GLfloat xequalzero[] = {1.0, 0.0, 0.0, 0.0};
+
+
+    glTexGenfv(GL_S, GL_OBJECT_PLANE, xequalzero);
+    glTexGenfv(GL_T, GL_OBJECT_PLANE, xequalzero);
+
+
+
+    glEnable(GL_TEXTURE_GEN_S);//启用s坐标的纹理生成
+    glEnable(GL_TEXTURE_GEN_T);//启用s坐标的纹理生成
+
+    glNormal3f(0.f, 0.f, 0.f);
+    //glutSolidSphere(100, 100, 100);
+    gluSphere(gluNewQuadric(), 0.8, 100, 100);
+
+    glPopMatrix();
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_TEXTURE_2D);
+
+    return;
+}
 
 void Draw_Triangle() // This function draws a triangle with RGB colors
 {
@@ -413,8 +475,6 @@ void Draw_Leg()
 
 
 
-float eye[] = {0, 0, 8};
-float eye_center[] = {0, 0, 0};
 
 void key(unsigned char k)
 {
@@ -428,33 +488,36 @@ void key(unsigned char k)
         case 'o': {bWire = !bWire; break;}
 
         case 'a': {
-            eye[0] += 0.2f;
-            eye_center[0] += 0.2f;
+            eye[0] += EYE_STEP_COEFFICIENT*(eye_center[2] - eye[2]);
+            eye[2] += EYE_STEP_COEFFICIENT*(-1)*(eye_center[0] - eye[0]);
+            //eye_center[0] -= 0.1f;
             break;
         }
         case 'd': {
-            eye[0] -= 0.2f;
-            eye_center[0] -= 0.2f;
+            eye[0] -= EYE_STEP_COEFFICIENT*(eye_center[2] - eye[2]);
+            eye[2] -= EYE_STEP_COEFFICIENT*(-1)*(eye_center[0] - eye[0]);
+            //eye_center[0] += 0.1f;
             break;
         }
         case 'w': {
-            eye[1] -= 0.2f;
-            eye_center[1] -= 0.2f;
+            eye[0] += EYE_STEP_COEFFICIENT*(eye_center[0] - eye[0]);
+            eye[2] += EYE_STEP_COEFFICIENT*(eye_center[2] - eye[2]);
+
+            //eye_center[2] -= 0.2f;
             break;
         }
         case 's': {
-            eye[1] += 0.2f;
-            eye_center[1] += 0.2f;
+            eye[0] -= EYE_STEP_COEFFICIENT*(eye_center[0] - eye[0]);
+            eye[2] -= EYE_STEP_COEFFICIENT*(eye_center[2] - eye[2]);
+            //eye_center[2] += 0.1f;
             break;
         }
         case 'z': {
-            eye[2] -= 0.2f;
-            eye_center[2] -= 0.2f;
+            eye[1] += EYE_STEP_COEFFICIENT;
             break;
         }
         case 'c': {
-            eye[2] += 0.2f;
-            eye_center[2] += 0.2f;
+            eye[1] -= EYE_STEP_COEFFICIENT;
             break;
         }
             // whether to enable texture blending
@@ -506,15 +569,52 @@ void key(unsigned char k)
 }
 
 
+
+
+
+
+
+
+
+
+void mouse_move(int dx, int dy){
+
+    eye_center[0] += 1.0*dx/wWidth;
+    eye_center[1] -= 1.0*dy/wHeight;
+
+    eye_theta[0] += 1.0*dx;
+    if(eye_theta[0]*EYE_ROTATION_COEFFICIENT < -360 || eye_theta[0]*EYE_ROTATION_COEFFICIENT > 360)
+        eye_theta[0] = 0;
+
+    eye_theta[1] += 1.0*dy;
+    if(eye_theta[1]*EYE_ROTATION_COEFFICIENT < -90)
+        eye_theta[1] = -90;
+    if(eye_theta[1]*EYE_ROTATION_COEFFICIENT > 90)
+        eye_theta[1] = 90;
+
+
+
+    updateView(wWidth, wHeight);
+}
+
+
+
+
 void redraw()
 {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();									// Reset The Current Modelview Matrix
 
+
+    eye_center[0] = eye[0] + sin(eye_theta[0]*EYE_ROTATION_COEFFICIENT/180*PI);
+    eye_center[1] = eye[1] - sin(eye_theta[1]*EYE_ROTATION_COEFFICIENT/180*PI);
+    eye_center[2] = eye[2] - cos(eye_theta[0]*EYE_ROTATION_COEFFICIENT/180*PI);
+
     gluLookAt(eye[0], eye[1], eye[2],
               eye_center[0], eye_center[1], eye_center[2],
               0, 1, 0);				// 场景（0，0，0）的视点中心 (0,5,50)，Y轴向上
+
 
     if (bWire) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -554,295 +654,24 @@ void redraw()
 
     glPushAttrib(GL_ALL_ATTRIB_BITS);   // save all attributes
     Draw_Triangle();						// Draw triangle
+
+    DrawCone(0,0,0);
+    glLoadIdentity();
+    //glutSolidSphere(0.9, 300, 300);
+
+
     glPopAttrib();  // restore all attributes
 
     if (bAnim) fRotate    += 0.5f;
-    glutSwapBuffers();
+
+    // NOTE QOpenGLContext::swapBuffers() called with non-exposed window, behavior is undefined
+    //glutSwapBuffers();
 }
 
 
 
 #endif
 
-
-#if TABLE
-float fTranslate;
-float fRotate = 0.f;
-float fScale     = 1.0f;	// set inital scale value to 1.0f
-
-bool bPersp = false;
-bool bAnim = false;
-bool bWire = false;
-
-int wHeight = 0;
-int wWidth = 0;
-
-float eye[] = {0, 0, 8};
-float eye_center[] = {0, 0, 0};
-float light_pos[] = {0.9, 0.9 , 1, 1};
-GLfloat light_color[] = { 1.0, 1.0, 1.0, 1.0 };
-GLfloat spot_angle = 0.f;
-
-float mat_specular_tea[] = {0.f, 0.f, 0.f, 0.f};
-
-
-
-void Draw_Leg()
-{
-    glScalef(1, 1, 3);
-    glutSolidCube(1.0);
-}
-
-
-void Draw_Table()
-{
-    glPushMatrix();
-    glTranslatef(0, 0, 4+1);
-    glRotatef(90, 1, 0, 0);
-    float mat_diffuse_tea[] = {0.85f, 0.65f, 0.2f, 1.0f};
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse_tea);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular_tea);
-    glutSolidTeapot(1);
-    {
-        float def_specular[] = {0.f, 0.f, 0.f, 0.f};
-        glMaterialfv(GL_FRONT, GL_SPECULAR, def_specular);
-    }
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(0, 0, 3.5);
-    glScalef(5, 4, 1);
-    float mat_diffuse_sur[] = {1.0f, 0.0f, 0.0f, 1.0f};
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse_sur);
-    glutSolidCube(1.0);
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(1.5, 1, 1.5);
-    float mat_diffuse_leg1[] = {0.f, 1.0f, 0.0f, 1.0f};
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse_leg1);
-    Draw_Leg();
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(-1.5, 1, 1.5);
-    float mat_diffuse_leg2[] = {1.0f, 1.0f, 0.0f, 1.0f};
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse_leg2);
-    Draw_Leg();
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(1.5, -1, 1.5);
-    float mat_diffuse_leg3[] = {0.0f, 1.0f, 1.0f, 1.0f};
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse_leg3);
-    Draw_Leg();
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(-1.5, -1, 1.5);
-    float mat_diffuse_leg4[] = {0.0f, 0.0f, 1.0f, 1.0f};
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse_leg4);
-    Draw_Leg();
-    glPopMatrix();
-
-}
-
-
-
-
-
-
-void redraw()
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();									// Reset The Current Modelview Matrix
-
-    gluLookAt(eye[0], eye[1], eye[2],
-              eye_center[0], eye_center[1], eye_center[2],
-              0, 1, 0);				// 场景（0，0，0）的视点中心 (0,5,50)，Y轴向上
-
-    if (bWire) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }
-    else {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
-
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHTING);
-    GLfloat white[] = { 1.0, 1.0, 1.0, 1.0 };
-
-    glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_color);
-    glLightfv(GL_LIGHT0, GL_EMISSION, light_color);
-    glEnable(GL_LIGHT0);
-    glPushMatrix();
-    glTranslatef(light_pos[0], light_pos[1], light_pos[2]);
-    //glMaterialfv(GL_FRONT, GL_AMBIENT, white);
-    glMaterialfv(GL_FRONT, GL_EMISSION, light_color);
-    glutSolidSphere(0.1, 300, 300);
-    {
-        float def_emi[] = {0.f, 0.f, 0.f, 1.f};
-        glMaterialfv(GL_FRONT, GL_EMISSION, def_emi);
-    }
-    glPopMatrix();
-
-
-
-    //printf("%f,%f,%f\n",light_pos[0],light_pos[1],light_pos[2]);
-    GLfloat spot_pos[] = {0.f, 3.0f, 0.0f, 0.5f};
-    GLfloat spot_direction[] = {0.f, -1.0f, 0.0f};
-    glLightfv(GL_LIGHT1, GL_POSITION, spot_pos);
-    glLightfv(GL_LIGHT1, GL_AMBIENT, white);
-    glLightfv(GL_LIGHT1, GL_EMISSION, white);
-    glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 2.0f);
-    glLightf (GL_LIGHT1, GL_SPOT_CUTOFF, spot_angle);
-    glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spot_direction);
-    //glEnable(GL_LIGHT1);
-
-
-
-
-    GLfloat light1_ambient[]= { 0.2, 0.2, 0.2, 1.0 };
-    GLfloat light1_diffuse[]= { 1.0, 0.0, 0.0, 1.0 };
-    GLfloat light1_specular[] = { 1.0, 0.6, 0.6, 1.0 };
-
-
-
-    glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, white);
-    glLightfv(GL_LIGHT1, GL_SPECULAR,light1_specular);
-
-
-
-
-    //	glTranslatef(0.0f, 0.0f,-6.0f);			// Place the triangle at Center
-    glRotatef(fRotate, 0, 1.0f, 0);			// Rotate around Y axis
-    glRotatef(-90, 1, 0, 0);
-    glScalef(0.2, 0.2, 0.2);
-    Draw_Table();						// Draw triangle
-
-    if (bAnim) fRotate    += 0.5f;
-    glutSwapBuffers();
-}
-
-
-
-void key(unsigned char k)
-{
-    switch(k)
-    {
-        case 27:
-        case 'q': {exit(0); break; }
-        case 'p': {bPersp = !bPersp; break; }
-
-        case ' ': {bAnim = !bAnim; break;}
-        case 'o': {bWire = !bWire; break;}
-
-        case 'a': {
-            eye[0] += 0.2f;
-            eye_center[0] += 0.2f;
-            break;
-        }
-        case 'd': {
-            eye[0] -= 0.2f;
-            eye_center[0] -= 0.2f;
-            break;
-        }
-        case 'w': {
-            eye[1] -= 0.2f;
-            eye_center[1] -= 0.2f;
-            break;
-        }
-        case 's': {
-            eye[1] += 0.2f;
-            eye_center[1] += 0.2f;
-            break;
-        }
-        case 'z': {
-            eye[2] -= 0.2f;
-            eye_center[2] -= 0.2f;
-            break;
-        }
-        case 'c': {
-            eye[2] += 0.2f;
-            eye_center[2] += 0.2f;
-            break;
-        }
-        case 'j':{
-            light_pos[0]-=0.2f;
-            break;
-        }
-        case 'l':{
-            light_pos[0]+=0.2f;
-            break;
-        }
-        case 'i':{
-            light_pos[1]+=0.2f;
-            break;
-        }
-        case 'k':{
-            light_pos[1]-=0.2f;
-            break;
-        }
-        case 'u':{
-            light_pos[2]-=0.2f;
-            break;
-        }
-        case 'n':{
-            light_pos[2]+=0.2f;
-            break;
-        }
-        case 'r':{
-            light_color[0] -= 0.05f;
-            break;
-        }
-        case 'R':{
-            light_color[0] += 0.05f;
-            break;
-        }
-        case 'g':{
-            light_color[1] -= 0.05f;
-            break;
-        }
-        case 'G':{
-            light_color[1] += 0.05f;
-            break;
-        }
-        case 'b':{
-            light_color[2] -= 0.05f;
-            break;
-        }
-        case 'B':{
-            light_color[2] += 0.05f;
-            break;
-        }
-        case 't':{
-            mat_specular_tea[0] += 0.1f;
-            mat_specular_tea[1] += 0.1f;
-            mat_specular_tea[2] += 0.1f;
-            break;
-        }
-        case 'T':{
-            mat_specular_tea[0] -= 0.1f;
-            mat_specular_tea[1] -= 0.1f;
-            mat_specular_tea[2] -= 0.1f;
-            break;
-        }
-        case 'y':{
-            spot_angle += 1.f;
-            break;
-        }
-        case 'Y':{
-            spot_angle -= 1.f;
-            break;
-        }
-    }
-
-    updateView(wWidth, wHeight);
-}
-
-#endif
 
 
 
@@ -858,6 +687,7 @@ void glFunctionInit()
     texSpot = load_texture(SPOT);
     texMonet = load_texture(MONET);
     texCustom = GenerateTex();
+    texNightSky = load_texture(NIGHTSKY);
 
     return;
 }

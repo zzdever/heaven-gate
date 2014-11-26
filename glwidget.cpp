@@ -1,6 +1,7 @@
 #include <QtWidgets>
 #include <QtOpenGL>
 
+#include "misc.h"
 #include "glwidget.h"
 
 GLWidget::GLWidget(QWidget *parent, QGLWidget *shareWidget)
@@ -11,6 +12,9 @@ GLWidget::GLWidget(QWidget *parent, QGLWidget *shareWidget)
     yRot = 0;
     zRot = 0;
 
+    isGLWidgetFocued = false;
+
+    this->setMouseTracking(false);
 }
 
 GLWidget::~GLWidget()
@@ -43,7 +47,7 @@ void GLWidget::setClearColor(const QColor &color)
 
 void GLWidget::initializeGL()
 {
-    makeObject();
+    //makeObject();
 
     glEnable(GL_DEPTH_TEST);
 //    glEnable(GL_CULL_FACE);
@@ -59,6 +63,16 @@ void GLWidget::initializeGL()
 
 void GLWidget::keyPress(QKeyEvent *event)
 {
+    if(event->modifiers() == (Qt::ControlModifier | Qt::AltModifier)){
+        isGLWidgetFocued = false;
+        this->setMouseTracking(false);
+        QApplication::setOverrideCursor(Qt::ArrowCursor);
+        QCursor::setPos(QWidget::mapToGlobal(QPoint(this->width()/2, this->height()/2)));
+
+        DEBUG("gl widget focus lost");
+        return;
+    }
+
     unsigned char k = event->key();;
     if(k<='Z'&&k>='A'){
         if(event->modifiers() == Qt::ShiftModifier)
@@ -120,19 +134,43 @@ void GLWidget::resizeGL(int width, int height)
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     lastPos = event->pos();
+
+    isGLWidgetFocued = true;
+    this->setMouseTracking(true);
+    QApplication::setOverrideCursor(Qt::BlankCursor);
+    QApplication::setOverrideCursor(Qt::BlankCursor);
+
+    DEBUG("gl widget focus got");
+
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    int dx = event->x() - lastPos.x();
-    int dy = event->y() - lastPos.y();
+    //int dx = event->x() - lastPos.x();
+    //int dy = event->y() - lastPos.y();
+    //lastPos = event->pos();
+
+    int dx = event->x() - this->width()/2;
+    int dy = event->y() - this->height()/2;
+
+    DEBUG("mouse position: "<<event->x()<<","<<event->y());
+
+    mouse_move(dx, dy);
+
+    if(isGLWidgetFocued){
+        QCursor::setPos(QWidget::mapToGlobal(QPoint(this->width()/2, this->height()/2)));
+        this->setCursor(Qt::BlankCursor);
+    }
+
+    return;
+
+
 
     if (event->buttons() & Qt::LeftButton) {
         rotateBy(8 * dy, 8 * dx, 0);
     } else if (event->buttons() & Qt::RightButton) {
         rotateBy(8 * dy, 0, 8 * dx);
     }
-    lastPos = event->pos();
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent * /* event */)

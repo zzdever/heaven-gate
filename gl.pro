@@ -15,12 +15,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
     window.cpp \
     glwidget.cpp \
-    glfunction.cpp
+    gldraw.cpp
 
 HEADERS  += \
     window.h \
     glwidget.h \
-    glfunction.h
+    misc.h \
+    gldraw.h
 
 FORMS    += mainwindow.ui
 

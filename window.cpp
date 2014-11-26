@@ -1,5 +1,6 @@
 #include <QtWidgets>
 
+#include "misc.h"
 #include "glwidget.h"
 #include "window.h"
 
