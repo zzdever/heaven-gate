@@ -8,6 +8,7 @@
 #include <GLUT/glut.h>
 
 #include "misc.h"
+#include "glall.h"
 
 
 class GLWidget : public QGLWidget
@@ -51,6 +52,8 @@ private:
     QVector<QVector2D> texCoords;
 
     bool isGLWidgetFocued;
+
+    GlAll glAll;
 
 
 };

@@ -13,6 +13,8 @@ class Window : public QWidget
 
 public:
     Window();
+    void setMainLayout(Window *parent);
+
 
 protected:
     void keyPressEvent(QKeyEvent *event);

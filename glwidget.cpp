@@ -1,7 +1,10 @@
 #include <QtWidgets>
 #include <QtOpenGL>
+#include <QMatrix>
+#include <QThread>
 
 #include "misc.h"
+#include "glall.h"
 #include "glwidget.h"
 
 GLWidget::GLWidget(QWidget *parent, QGLWidget *shareWidget)
@@ -56,7 +59,7 @@ void GLWidget::initializeGL()
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 
 
-    glFunctionInit();
+    glAll.glFunctionInit();
 
 }
 
@@ -73,6 +76,48 @@ void GLWidget::keyPress(QKeyEvent *event)
         return;
     }
 
+    if(event->modifiers() == (Qt::ControlModifier)){
+        switch (event->key()) {
+        case '=':{
+            glAll.key('+');
+            DEBUG("zoom in");
+            break;
+        }
+
+        case '-':{
+            glAll.key('-');
+            DEBUG("zoom out");
+            break;
+        }
+
+        case '0':{
+            glAll.key('0');
+            DEBUG("zoom to fit");
+            break;
+        }
+
+        case 'P':{
+            glAll.key('P');
+            DEBUG("pan");
+            break;
+        }
+
+        case 'O':{
+            glAll.key('O');
+            DEBUG("orbit");
+            break;
+        }
+
+        default:{
+            DEBUG(event->key());
+            break;
+        }
+        }
+
+        return;
+    }
+
+
     unsigned char k = event->key();;
     if(k<='Z'&&k>='A'){
         if(event->modifiers() == Qt::ShiftModifier)
@@ -82,14 +127,32 @@ void GLWidget::keyPress(QKeyEvent *event)
         }
     }
 
-    key(k);
+    if(k == 'g'){
+        QString fileName = QFileDialog::getSaveFileName(this,
+                                   tr("Save Screenshot"), QDir::homePath());
+        if (!fileName.isEmpty())
+        {
+            this->paintGL();
+            glFlush();
+            QImage image = this->grabFrameBuffer();
+            image.save(fileName,"JPG");
+
+            return;
+        }
+    }
+    else{
+        glAll.key(k);
+    }
+
+
+
 
     return;
 }
 
 void GLWidget::paintGL()
 {
-    redraw();
+    glAll.redraw();
     return;
 
 
@@ -115,7 +178,7 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int width, int height)
 {
-    reshape(this->width(), this->height());
+    glAll.reshape(this->width(), this->height());
     return;
 
 
@@ -155,7 +218,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
     DEBUG("mouse position: "<<event->x()<<","<<event->y());
 
-    mouse_move(dx, dy);
+    glAll.mouse_move(dx, dy);
 
     if(isGLWidgetFocued){
         QCursor::setPos(QWidget::mapToGlobal(QPoint(this->width()/2, this->height()/2)));
