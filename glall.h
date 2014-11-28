@@ -5,6 +5,7 @@
 
 #include "misc.h"
 #include "globject.h"
+#include "gllight.h"
 
 
 //==========================================
@@ -18,6 +19,7 @@
 
 #define BMP_Header_Length 54
 
+
 #define EYE_ROTATION_COEFFICIENT 0.05
 #define EYE_STEP_COEFFICIENT 0.07
 #define ZOOM_STEP_COEFFICIENT 0.7
@@ -27,26 +29,45 @@
 
 class GlAll{
 public:
-    GlAll(){;}
-    ~GlAll(){;}
+    GlAll(){}
+    ~GlAll(){}
 
+    // light control
+    GlLight lights[LIGHT_COUNT];
+    int lightUnderControl;
+
+
+public:
+    void init();
+    void idle();
+    void redraw();
+    void reshape(int width, int height);
+    void updateView(int width, int height);
+    void glAllInit();
+
+    void key(unsigned char k);
+    void mouse_press(int button,int state,int x,int y);
+    void mouse_move(int dx, int dy);
+
+    void change_light(int num, float value[4], LightParam param = Diffuse);
+
+private:
 
     float fTranslate;
     float fRotate;
-    float fScale     = 1.0f;	// set inital scale value to 1.0f
+    float fScale;
 
-    bool bPersp = true;
-    bool bAnim = false;
-    bool bWire = false;
+    bool bPersp;
+    bool bAnim;
+    bool bWire;
 
-    GLfloat light_pos[4] = {0.9, 0.9 , 1, 1};
+    int wHeight;
+    int wWidth;
 
-    int wHeight = 0;
-    int wWidth = 0;
 
-    bool texBlend = false;
-    bool texCus = false;
-
+    // texture
+    bool texBlend;
+    bool texCus;
 
     GLuint texCrack;
     GLuint texSpot;
@@ -54,50 +75,30 @@ public:
     GLuint texCustom;
     GLuint texNightSky;
 
+    // view control
+    float eye[3];
+    float eye_center[3];
+    float eye_theta[2];
 
-    float eye[3] = {0, 0, 8};
-    float eye_center[3] = {0, 0, 0};
-    float eye_theta[2] = {0, 0};
-
-
-    float zoomAmount = 0.;
-    float sideAmount = 0;
-    float updownAmount = 0;
-
-
+    // move control
+    float zoomAmount;
+    float sideAmount;
+    float updownAmount;
 
 
-
-
-    void init();
-    void idle();
-    void redraw();
-    void reshape(int width, int height);
-    void updateView(int width, int height);
-    void glFunctionInit();
-
-    void key(unsigned char k);
-    void mouse_press(int button,int state,int x,int y);
-    void mouse_move(int dx, int dy);
-
-
-private:
     GLuint load_texture(const char* file_name);
     GLuint GenerateTex();
 
     void MoveControl();
     void MoveEye();
 
-    void drawBox(GLfloat size, GLenum type);
 
+    void drawBox(GLfloat size, GLenum type);
     void glutSolidCube(GLdouble size);
     void DrawCone(float x, float y, float z);
     void DrawSky();
     void Draw_Triangle();
     void Draw_Leg();
-
-
-
 
 };
 

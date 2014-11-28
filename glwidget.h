@@ -56,6 +56,45 @@ private:
     GlAll glAll;
 
 
+    LightParam lightParam;
+    int lightR;
+    int lightG;
+    int lightB;
+    int lightA;
+
+    void changeLightDriver();
+
+public slots:
+    void SwitchLight(){
+        glAll.lights[glAll.lightUnderControl].Switch();
+    }
+    void SwitchLightNum(int num){
+        glAll.lightUnderControl = num;
+    }
+    /*
+    void SwitchLightParam(LightParam param){
+        lightParam = param;
+    }
+    */
+    void changeR(int value){
+        lightR = value;
+        changeLightDriver();
+    }
+    void changeG(int value){
+        lightG = value;
+        changeLightDriver();
+    }
+    void changeB(int value){
+        lightB = value;
+        changeLightDriver();
+    }
+    void changeA(int value){
+        lightA = value;
+        changeLightDriver();
+    }
+
+
+
 };
 
 #endif

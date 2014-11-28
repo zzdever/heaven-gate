@@ -30,13 +30,21 @@ void Window::setMainLayout(Window* parent)
 
     // light number
     QGroupBox *lightNumGroup = new QGroupBox(lightGroup);
-    QComboBox *lightNum = new QComboBox(lightGroup);
-    for (int i=0; i<8; i++){
+    lightNumGroup->setTitle(tr("Lights"));
+    QComboBox *lightNum = new QComboBox(lightNumGroup);
+    for (int i=0; i<LIGHT_COUNT; i++){
         lightNum->addItem(QString::number(i,10));
     }
-    lightNumGroup->setTitle(tr("Light Number"));
-    QVBoxLayout *lightNumLayout = new QVBoxLayout(lightNumGroup);
-    lightNumLayout->addWidget(lightNum);
+    connect(lightNum, SIGNAL(currentIndexChanged(int)), glWidgetMain, SLOT(SwitchLightNum(int)));
+
+    QPushButton *lightSwitch = new QPushButton(lightNumGroup);
+    lightSwitch->setText("On/OFF");
+    connect(lightSwitch, SIGNAL(clicked()), glWidgetMain, SLOT(SwitchLight()));
+
+    QHBoxLayout *lightNumGroupLayout = new QHBoxLayout(lightNumGroup);
+    lightNumGroupLayout->addWidget(lightNum);
+    lightNumGroupLayout->addWidget(lightSwitch);
+
 
 
     //GL_AMBIENT、GL_DIFFUSE、GL_SPECULAR
@@ -44,35 +52,46 @@ void Window::setMainLayout(Window* parent)
     QGroupBox *lightColorGroup = new QGroupBox(lightGroup);
     lightColorGroup->setTitle(tr("Light Color"));
 
+    /*
     QComboBox *colorType = new QComboBox(lightColorGroup);
     colorType->addItem(QString("Ambient"));
     colorType->addItem(QString("Diffuse"));
     colorType->addItem(QString("Specular"));
+    connect(colorType, SIGNAL(currentIndexChanged(int)), glWidgetMain, SLOT(SwitchLightParam(int)));
+    */
 
     QSlider *rColorSlider = new QSlider(Qt::Horizontal, lightColorGroup);
     rColorSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     rColorSlider->setRange(0,255);
     rColorSlider->setValue(255);
+    connect(rColorSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(changeR(int)));
+
 
     QSlider *gColorSlider = new QSlider(Qt::Horizontal, lightColorGroup);
     gColorSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     gColorSlider->setRange(0,255);
     gColorSlider->setValue(255);
+    connect(gColorSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(changeG(int)));
 
     QSlider *bColorSlider = new QSlider(Qt::Horizontal, lightColorGroup);
     bColorSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     bColorSlider->setRange(0,255);
     bColorSlider->setValue(255);
+    connect(bColorSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(changeB(int)));
+
 
     QSlider *aColorSlider = new QSlider(Qt::Horizontal, lightColorGroup);
     aColorSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     aColorSlider->setRange(0,255);
     aColorSlider->setValue(255);
+    connect(aColorSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(changeA(int)));
 
 
     QGridLayout *lightColorLayout = new QGridLayout(lightColorGroup);
     lightColorLayout->setColumnStretch(1, 2);
+    /*
     lightColorLayout->addWidget(colorType,0,0,1,2);
+    */
     lightColorLayout->addWidget(new QLabel("R"), 1, 0);
     lightColorLayout->addWidget(rColorSlider, 1, 1);
     lightColorLayout->addWidget(new QLabel("G"), 2, 0);

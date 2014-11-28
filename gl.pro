@@ -4,21 +4,13 @@
 #
 #-------------------------------------------------
 
-QT       += core gui opengl
+QT += core gui opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = gl
 TEMPLATE = app
 
-
-SOURCES += main.cpp\
-    window.cpp \
-    glwidget.cpp \
-    gldraw.cpp \
-    glcontrol.cpp \
-    globject.cpp \
-    gllight.cpp
 
 HEADERS  += \
     window.h \
@@ -28,9 +20,18 @@ HEADERS  += \
     gllight.h \
     glall.h
 
+SOURCES += main.cpp\
+    window.cpp \
+    glwidget.cpp \
+    gldraw.cpp \
+    glcontrol.cpp \
+    globject.cpp \
+    gllight.cpp
+
 FORMS    += mainwindow.ui
 
 RESOURCES += \
     opengl.qrc
 
-LIBS+= -framework glut
+LIBS += -framework glut \
+    -framework opengl

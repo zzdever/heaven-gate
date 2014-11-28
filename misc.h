@@ -14,6 +14,8 @@
 
 #define PI 3.1415926
 
+#define LIGHT_COUNT 8
+
 
 struct Point3f{
     float x;
@@ -29,6 +31,12 @@ enum ObjectType{
 
 };
 
+enum LightParam{
+    Ambient = 0,
+    Diffuse = 1,
+    Specular = 2,
+    Position = 3
+};
 
 
 

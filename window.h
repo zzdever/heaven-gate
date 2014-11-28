@@ -27,7 +27,7 @@ private:
     enum { NumRows = 2, NumColumns = 3 };
 
     GLWidget *glWidgetMain;
-    GLWidget *glWidgets[NumRows][NumColumns];
+    //GLWidget *glWidgets[NumRows][NumColumns];
     GLWidget *currentGlWidget;
 };
 

@@ -18,6 +18,13 @@ GLWidget::GLWidget(QWidget *parent, QGLWidget *shareWidget)
     isGLWidgetFocued = false;
 
     this->setMouseTracking(false);
+
+
+    lightParam = Ambient;
+    lightR = 255;
+    lightG = 255;
+    lightB = 255;
+    lightA = 255;
 }
 
 GLWidget::~GLWidget()
@@ -50,17 +57,10 @@ void GLWidget::setClearColor(const QColor &color)
 
 void GLWidget::initializeGL()
 {
+    glAll.glAllInit();
+
+
     //makeObject();
-
-    glEnable(GL_DEPTH_TEST);
-//    glEnable(GL_CULL_FACE);
-    glEnable(GL_TEXTURE_2D);
-
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
-
-
-    glAll.glFunctionInit();
-
 }
 
 
@@ -109,7 +109,6 @@ void GLWidget::keyPress(QKeyEvent *event)
         }
 
         default:{
-            DEBUG(event->key());
             break;
         }
         }
@@ -121,13 +120,45 @@ void GLWidget::keyPress(QKeyEvent *event)
     unsigned char k = event->key();;
     if(k<='Z'&&k>='A'){
         if(event->modifiers() == Qt::ShiftModifier)
-            ;
+            ;   // do nothing
         else{
             k = k - 'A' + 'a';
         }
     }
 
-    if(k == 'g'){
+    switch (k) {
+    // move diffusion light to left
+    case 'j':{
+        glAll.lights[glAll.lightUnderControl].MovePosition(-0.2f,0,0);
+        break;
+    }
+    // move diffusion light to right
+    case 'l':{
+        glAll.lights[glAll.lightUnderControl].MovePosition(0.2f,0,0);
+        break;
+    }
+    // move diffusion light up
+    case 'i':{
+        glAll.lights[glAll.lightUnderControl].MovePosition(0, 0.2f, 0);
+        break;
+    }
+    // move diffusion light down
+    case 'k':{
+        glAll.lights[glAll.lightUnderControl].MovePosition(0, -0.2f, 0);
+        break;
+    }
+    // move diffusion light back
+    case 'u':{
+        glAll.lights[glAll.lightUnderControl].MovePosition(0, 0, -0.2f);
+        break;
+    }
+    // move diffusion light forward
+    case 'n':{
+        glAll.lights[glAll.lightUnderControl].MovePosition(0, 0, 0.2f);
+        break;
+    }
+
+    case 'g':{
         QString fileName = QFileDialog::getSaveFileName(this,
                                    tr("Save Screenshot"), QDir::homePath());
         if (!fileName.isEmpty())
@@ -140,10 +171,13 @@ void GLWidget::keyPress(QKeyEvent *event)
             return;
         }
     }
-    else{
-        glAll.key(k);
-    }
 
+        break;
+    default:{
+        glAll.key(k);
+        break;
+    }
+    }
 
 
 
@@ -209,10 +243,6 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    //int dx = event->x() - lastPos.x();
-    //int dy = event->y() - lastPos.y();
-    //lastPos = event->pos();
-
     int dx = event->x() - this->width()/2;
     int dy = event->y() - this->height()/2;
 
@@ -239,6 +269,35 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 void GLWidget::mouseReleaseEvent(QMouseEvent * /* event */)
 {
     emit clicked();
+}
+
+
+
+void GLWidget::changeLightDriver()
+{
+    float values[4];
+    values[0] = 1.0*lightR/255;
+    values[1] = 1.0*lightG/255;
+    values[2] = 1.0*lightB/255;
+    values[3] = 1.0*lightA/255;
+    /*
+    LightParam param;
+    switch (lightParam) {
+    case 0:
+        param = Ambient;
+        break;
+    case 1:
+        param = Diffuse;
+        break;
+    case 2:
+        param = Specular;
+        break;
+    default:
+        param = Ambient;
+        break;
+    }
+    */
+    glAll.change_light(glAll.lightUnderControl, values);
 }
 
 void GLWidget::makeObject()
