@@ -8,7 +8,6 @@ void GlAll::redraw()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();									// Reset The Current Modelview Matrix
 
-
     MoveControl();
     MoveEye();
 
@@ -45,6 +44,16 @@ void GlAll::redraw()
     //DrawCone(0,0,0);
     //glLoadIdentity();
     //glutSolidSphere(0.9, 300, 300);
+
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CW);
+    glBindTexture(GL_TEXTURE_2D, texNightSky); // 设置纹理
+    GLUquadricObj *quadricObj;
+    quadricObj = gluNewQuadric(); // 绘制球体
+    gluQuadricNormals(quadricObj, GL_SMOOTH); // 产生光滑
+    gluQuadricTexture(quadricObj, GL_TRUE); // 激活曲面纹理坐标参照
+    gluSphere(quadricObj, 100.0f, 32, 16); // 绘制球体
+
 
 
     glPopAttrib();  // restore all attributes

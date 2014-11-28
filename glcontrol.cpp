@@ -439,6 +439,8 @@ void GlAll::glAllInit()
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // 精细的透视修正计算
+
 
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 

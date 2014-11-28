@@ -14,7 +14,7 @@
 #define CRACK "/Users/ying/Crack.bmp"
 #define SPOT "/Users/ying/Spot.bmp"
 #define MONET "/Users/ying/Monet.bmp"
-#define NIGHTSKY "/Users/ying/nightsky.bmp"
+#define NIGHTSKY "/Users/ying/starskyrecur.bmp"
 //==========================================
 
 #define BMP_Header_Length 54
