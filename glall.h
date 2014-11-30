@@ -100,6 +100,8 @@ private:
     void Draw_Triangle();
     void Draw_Leg();
 
+    void Radio();
+
 };
 
 

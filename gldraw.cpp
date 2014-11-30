@@ -2,6 +2,48 @@
 #include "glall.h"
 
 
+
+void setMatirial(const GLfloat mat_diffuse[4], GLfloat mat_shininess)
+{
+    static const GLfloat mat_specular[] = {0.0f, 0.0f, 0.0f, 1.0f};
+    static const GLfloat mat_emission[] = {0.0f, 0.0f, 0.0f, 1.0f};
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, mat_diffuse);
+
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+
+    glMaterialfv(GL_FRONT, GL_EMISSION, mat_emission);
+
+    glMaterialf (GL_FRONT, GL_SHININESS, mat_shininess);
+
+}
+
+
+void DrawCube(){
+    glutSolidCube(1.0);
+}
+
+void DrawSphere(){
+    glutSolidSphere(0.5, 60, 60);
+}
+
+void DrawCylinder(){
+    glPushMatrix();
+    glRotatef(-90,1,0,0);
+    glTranslatef(0,0,-0.5);
+    gluCylinder(gluNewQuadric(), 0.5, 0.5, 1.0, 60, 60);
+    glPopMatrix();
+}
+
+void DrawCone2(){
+    glPushMatrix();
+    glRotatef(-90,1,0,0);
+    glTranslatef(0,0,-0.5);
+    glutSolidCone(0.5, 1.0, 60, 60);
+    glPopMatrix();
+}
+
 void GlAll::redraw()
 {
 
@@ -30,6 +72,22 @@ void GlAll::redraw()
         lights[i].DrawLight();
     }
 
+
+
+    ObjectFramework cube(1,1,1);
+    cube.SetPosition(0,0,2);
+    cube.SetScale(0.5);
+    cube.SetTexture(texCrack);
+    cube.Draw(DrawCube);
+
+    ObjectFramework cylinder(1,1,1);
+    cylinder.SetPosition(-2,0,2);
+    cylinder.Draw(DrawCylinder);
+
+    ObjectFramework cone(1,1,1);
+    cone.SetPosition(2,0,2);
+    cone.SetScale(1.5);
+    cone.Draw(DrawCone2);
 
 
 

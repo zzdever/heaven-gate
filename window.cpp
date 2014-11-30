@@ -19,8 +19,104 @@ void Window::setMainLayout(Window* parent)
     clearColor.setRgb(125,127,25);
     glWidgetMain = new GLWidget(0,0);
     glWidgetMain->setClearColor(clearColor);
-    mainLayout->addWidget(glWidgetMain, 0, 0);
+    mainLayout->addWidget(glWidgetMain,0,0,2,1);
     currentGlWidget = glWidgetMain;
+
+
+
+
+
+    QGroupBox *objectGroup = new QGroupBox(parent);
+    objectGroup->setFixedWidth(180);
+    objectGroup->setTitle(tr("Object Control"));
+
+
+    // object names
+    QGroupBox *objectNameGroup = new QGroupBox(objectGroup);
+    objectNameGroup->setTitle(tr("Objects"));
+    QComboBox *objectName = new QComboBox(objectNameGroup);
+    // TODO add items
+    objectName->addItem("desk");
+    //connect(objectName, SIGNAL(currentIndexChanged(int)), glWidgetMain, SLOT(SwitchObjectNum(int)));
+
+    QHBoxLayout *objectNameGroupLayout = new QHBoxLayout(objectNameGroup);
+    objectNameGroupLayout->addWidget(objectName);
+
+
+
+    // rotate, move, scale
+
+    QGroupBox *objectPropertyGroup = new QGroupBox(objectGroup);
+    objectPropertyGroup->setTitle(tr("Object Property"));
+
+    QComboBox *objectTexture = new QComboBox(objectPropertyGroup);
+    // TODO add items
+    objectTexture->addItem("crack");
+    //connect(objectTexture, SIGNAL(currentIndexChanged(int)), glWidgetMain, SLOT(SwitchObjectNum(int)));
+
+
+    QSlider *moveXSlider = new QSlider(Qt::Horizontal, objectPropertyGroup);
+    moveXSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    moveXSlider->setRange(-100,100);
+    moveXSlider->setValue(0);
+    // TODO slot should set back to 0
+    //connect(moveXSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(moveX(int)));
+
+
+    QSlider *moveYSlider = new QSlider(Qt::Horizontal, objectPropertyGroup);
+    moveYSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    moveYSlider->setRange(-100,100);
+    moveYSlider->setValue(0);
+    //connect(moveYSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(changeG(int)));
+
+    QSlider *moveZSlider = new QSlider(Qt::Horizontal, objectPropertyGroup);
+    moveZSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    moveZSlider->setRange(-100,100);
+    moveZSlider->setValue(0);
+    //connect(moveZSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(changeB(int)));
+
+
+    QSlider *rotateSlider = new QSlider(Qt::Horizontal, objectPropertyGroup);
+    rotateSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    rotateSlider->setRange(0,360);
+    rotateSlider->setValue(0);
+    //connect(rotateSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(changeA(int)));
+
+
+    QSlider *scaleSlider = new QSlider(Qt::Horizontal, objectPropertyGroup);
+    scaleSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    scaleSlider->setRange(0,500);
+    scaleSlider->setValue(100);
+    //connect(scaleSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(changeA(int)));
+
+
+    QGridLayout *objectPropertyGroupLayout = new QGridLayout(objectPropertyGroup);
+    objectPropertyGroupLayout->setColumnStretch(1,2);
+    objectPropertyGroupLayout->addWidget(new QLabel("Tex"),0,0);
+    objectPropertyGroupLayout->addWidget(objectTexture,0,1);
+    objectPropertyGroupLayout->addWidget(new QLabel("MoveX"), 1, 0);
+    objectPropertyGroupLayout->addWidget(moveXSlider,1,1);
+    objectPropertyGroupLayout->addWidget(new QLabel("MoveY"), 2, 0);
+    objectPropertyGroupLayout->addWidget(moveYSlider,2,1);
+    objectPropertyGroupLayout->addWidget(new QLabel("MoveZ"), 3, 0);
+    objectPropertyGroupLayout->addWidget(moveZSlider,3,1);
+    objectPropertyGroupLayout->addWidget(new QLabel("Rotate"), 4, 0);
+    objectPropertyGroupLayout->addWidget(rotateSlider,4,1);
+    objectPropertyGroupLayout->addWidget(new QLabel("Scale"), 5, 0);
+    objectPropertyGroupLayout->addWidget(scaleSlider,5,1);
+
+
+
+    //object control layout
+    QVBoxLayout *objectGroupLayout = new QVBoxLayout(objectGroup);
+    objectGroupLayout->setMargin(3);
+    objectGroupLayout->addWidget(objectNameGroup);
+    objectGroupLayout->addWidget(objectPropertyGroup);
+
+
+
+
+
 
 
     QGroupBox *lightGroup = new QGroupBox(parent);
@@ -102,8 +198,6 @@ void Window::setMainLayout(Window* parent)
     lightColorLayout->addWidget(aColorSlider, 4, 1);
 
 
-
-
     //light control layout
     QVBoxLayout *lightGroupLayout = new QVBoxLayout(lightGroup);
     lightGroupLayout->setMargin(3);
@@ -112,7 +206,8 @@ void Window::setMainLayout(Window* parent)
     lightGroupLayout->addStretch(1);
 
 
-    mainLayout->addWidget(lightGroup, 0, 1);
+    mainLayout->addWidget(objectGroup,0,1);
+    mainLayout->addWidget(lightGroup,1,1);
 
     setLayout(mainLayout);
 

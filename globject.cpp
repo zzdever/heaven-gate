@@ -1,13 +1,13 @@
 #include "globject.h"
 
 
-bool ObjectFramework::isInFramework(Point3f point)
-{
+//bool ObjectFramework::isInFramework(Point3f point)
+//{
 
-    return false;
-}
+//    return false;
+//}
 
 
-GlObject::GlObject()
-{
-}
+//GlObject::GlObject()
+//{
+//}

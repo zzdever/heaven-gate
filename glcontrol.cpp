@@ -439,7 +439,16 @@ void GlAll::glAllInit()
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // 精细的透视修正计算
+
+
+//    glEnable(GL_POINT_SMOOTH);
+//    glEnable(GL_LINE_SMOOTH);
+//    glEnable(GL_POLYGON_SMOOTH);
+
+//    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+//    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+//    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+//    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
