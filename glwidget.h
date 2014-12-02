@@ -55,7 +55,6 @@ private:
 
     GlAll glAll;
 
-
     LightParam lightParam;
     int lightR;
     int lightG;

@@ -18,7 +18,9 @@ HEADERS  += \
     misc.h \
     globject.h \
     gllight.h \
-    glall.h
+    glall.h \
+    objfile.h \
+    nurbs.h
 
 SOURCES += main.cpp\
     window.cpp \
@@ -26,7 +28,9 @@ SOURCES += main.cpp\
     gldraw.cpp \
     glcontrol.cpp \
     globject.cpp \
-    gllight.cpp
+    gllight.cpp \
+    objfile.cpp \
+    nurbs.cpp
 
 FORMS    += mainwindow.ui
 

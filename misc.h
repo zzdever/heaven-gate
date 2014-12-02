@@ -5,6 +5,8 @@
 #include <iostream>
 #include <math.h>
 
+#include <GLUT/glut.h>
+
 
 #define TEST 1
 
@@ -14,7 +16,7 @@
 
 #define PI 3.1415926
 
-#define LIGHT_COUNT 8
+#define LIGHT_COUNT 1
 
 
 struct Point3f{

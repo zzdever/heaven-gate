@@ -4,6 +4,7 @@
 
 #include "glall.h"
 
+
 class ObjectFramework
 {
 public:

@@ -1,11 +1,12 @@
 #ifndef GLALL_H
 #define GLALL_H
 
-#include <GLUT/glut.h>
 
-#include "misc.h"
 #include "globject.h"
 #include "gllight.h"
+#include "misc.h"
+#include "objfile.h"
+#include "nurbs.h"
 
 
 //==========================================
@@ -84,6 +85,10 @@ private:
     float zoomAmount;
     float sideAmount;
     float updownAmount;
+
+
+    ObjFileSupport objfile;
+    Nurbs tableLamp;
 
 
     GLuint load_texture(const char* file_name);

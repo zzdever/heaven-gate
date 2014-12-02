@@ -3,6 +3,9 @@
 
 
 
+
+
+
 void setMatirial(const GLfloat mat_diffuse[4], GLfloat mat_shininess)
 {
     static const GLfloat mat_specular[] = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -46,13 +49,11 @@ void DrawCone2(){
 
 void GlAll::redraw()
 {
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();									// Reset The Current Modelview Matrix
 
     MoveControl();
     MoveEye();
-
 
     if (bWire) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -73,6 +74,9 @@ void GlAll::redraw()
     }
 
 
+    tableLamp.DrawTableLamp();
+
+    return;
 
     ObjectFramework cube(1,1,1);
     cube.SetPosition(0,0,2);
@@ -90,14 +94,20 @@ void GlAll::redraw()
     cone.Draw(DrawCone2);
 
 
+    objfile.DrawModel();
+
+
 
     //	glTranslatef(0.0f, 0.0f,-6.0f);			// Place the triangle at Center
     glRotatef(fRotate, 0, 1.0f, 0);			// Rotate around Y axis
     glRotatef(-90, 1, 0, 0);
     glScalef(0.2, 0.2, 0.2);
 
+
     glPushAttrib(GL_ALL_ATTRIB_BITS);   // save all attributes
     Draw_Triangle();						// Draw triangle
+
+
 
     //DrawCone(0,0,0);
     //glLoadIdentity();

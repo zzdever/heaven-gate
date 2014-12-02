@@ -453,6 +453,7 @@ void GlAll::glAllInit()
 
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 
+    objfile.ReadFile("/Users/ying/Documents/DEV/qt_prj/gl/girl.obj");
 
 
     return;
