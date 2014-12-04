@@ -6,57 +6,6 @@
 
 void GlAll::ProcessHits(GLint hits, GLuint buffer[])
 {
-<<<<<<< HEAD
-    if(model==GL_SELECT){
-        glColor3f(1.0,0.0,0.0);
-        glLoadName(100);
-        glPushMatrix();
-        glTranslatef(-5, 0.0, 10.0);
-        glBegin(GL_QUADS);
-        glVertex3f(-1, -1, 0);
-        glVertex3f( 1, -1, 0);
-        glVertex3f( 1, 1, 0);
-        glVertex3f(-1, 1, 0);
-        glEnd();
-        glPopMatrix();
-
-        glColor3f(0.0,0.0,1.0);
-        glLoadName(101);
-        glPushMatrix();
-        glTranslatef(5, 0.0, -10.0);
-        glBegin(GL_QUADS);
-        glVertex3f(-1, -1, 0);
-        glVertex3f( 1, -1, 0);
-        glVertex3f( 1, 1, 0);
-        glVertex3f(-1, 1, 0);
-        glEnd();
-        glPopMatrix();
-        glPopName();
-    }
-    else{
-        glColor3f(1.0,0.0,0.0);
-        glPushMatrix();
-        glTranslatef(-5, 0.0, -5.0);
-        glBegin(GL_QUADS);
-        glVertex3f(-1, -1, 0);
-        glVertex3f( 1, -1, 0);
-        glVertex3f( 1, 1, 0);
-        glVertex3f(-1, 1, 0);
-        glEnd();
-        glPopMatrix();
-
-        glColor3f(0.0,0.0,1.0);
-        glPushMatrix();
-        glTranslatef(5, 0.0, -10.0);
-        glBegin(GL_QUADS);
-        glVertex3f(-1, -1, 0);
-        glVertex3f( 1, -1, 0);
-        glVertex3f( 1, 1, 0);
-        glVertex3f(-1, 1, 0);
-        glEnd();
-        glPopMatrix();
-    }
-=======
     unsigned int i, j;
     GLuint names, *ptr, minZ, *ptrNames, numberOfNames;
 
@@ -89,7 +38,6 @@ void GlAll::ProcessHits(GLint hits, GLuint buffer[])
                  objectList.at(k)->Unselect();
          }
      }
->>>>>>> pick
 }
 
 
