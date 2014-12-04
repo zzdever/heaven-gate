@@ -1,12 +1,13 @@
 #include "globject.h"
 
 
-int ObjectFramework::objectFrameworkCount = 0;
+int ObjectFramework::objectFrameworkCount = 100; // count from 100
 
 
 ObjectFramework::ObjectFramework()
 {
     objectFrameworkID = objectFrameworkCount++;
+    objectFrameworkName = "";
 
     length = 1.0;
     width = 1.0;
@@ -16,8 +17,21 @@ ObjectFramework::ObjectFramework()
     position_x = 0.;
     position_y = 0.;
     position_z = 0.;
+
+    rotation_x = 0.;
+    rotation_y = 0.;
+    rotation_z = 0.;
+
+    en_length = 1.0;
+    en_width = 1.0;
+    en_height = 1.0;
 }
 
+void ObjectFramework::SetEnvelopingDimension(GLfloat p_length, GLfloat p_width, GLfloat p_height){
+    en_length = p_length;
+    en_width = p_width;
+    en_height = p_height;
+}
 
 void ObjectFramework::SetDimension(GLfloat p_length, GLfloat p_width, GLfloat p_height)
 {
@@ -28,14 +42,16 @@ void ObjectFramework::SetDimension(GLfloat p_length, GLfloat p_width, GLfloat p_
     return;
 }
 
-GLfloat* ObjectFramework::GetDimension() const
+
+Dimension3f ObjectFramework::GetDimension() const
 {
-    GLfloat dimension[3];
-    dimension[0] = length;
-    dimension[1] = width;
-    dimension[2] = height;
+    Dimension3f dimension;
+    dimension.length = length;
+    dimension.width = width;
+    dimension.height = height;
     return dimension;
 }
+
 
 void ObjectFramework::SetPosition(GLfloat x, GLfloat y, GLfloat z)
 {
@@ -51,20 +67,22 @@ void ObjectFramework::MovePosition(GLfloat dx, GLfloat dy, GLfloat dz)
     position_z += dz;
 }
 
-GLfloat* ObjectFramework::GetPosition() const
+
+Point3f ObjectFramework::GetPosition() const
 {
-    GLfloat position[3];
-    position[0] = position_x;
-    position[1] = position_y;
-    position[2] = position_z;
-    return position;
+    Point3f point;
+    point.x = position_x;
+    point.y = position_y;
+    point.z = position_z;
+    return point;
 }
 
-void ObjectFramework::SetRotation(int rx, int ry, int rz)
+
+void ObjectFramework::SetRotation(int drx, int dry, int drz)
 {
-    rotation_x = rx;
-    rotation_y = ry;
-    rotation_z = rz;
+    drx == 0 ? : rotation_x += drx;
+    dry == 0 ? : rotation_y += dry;
+    drz == 0 ? : rotation_z += drz;
 }
 
 void ObjectFramework::SetDrawEnv(GLenum drawMode)
@@ -73,15 +91,28 @@ void ObjectFramework::SetDrawEnv(GLenum drawMode)
     glPushMatrix();
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-    //glScalef(scaleCoefficient, scaleCoefficient, scaleCoefficient);
-    glScalef(length*scaleCoefficient, width*scaleCoefficient, height*scaleCoefficient);
+
+    // move
     glTranslatef(position_x, position_y, position_z);
 
+    // rotate
+    glRotatef(rotation_x,1.0,0.,0.);
+    glRotatef(rotation_y,0.,1.0,0.);
+    glRotatef(rotation_z,0.,0.,1.0);
+
+
+    //scale
+    glScalef(length*scaleCoefficient, height*scaleCoefficient, width*scaleCoefficient);
+
+    // texture
     glBindTexture(GL_TEXTURE_2D, texture);
 
     // draw the framework
     if(isSelected){
+        glPushMatrix();
+        glScalef(en_length+0.05, en_height+0.05, en_width+0.05);
         glutWireCube(1.0);
+        glPopMatrix();
     }
 
     if(drawMode == GL_SELECT)

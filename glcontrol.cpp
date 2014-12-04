@@ -29,6 +29,14 @@ void GlAll::ProcessHits(GLint hits, GLuint buffer[])
 
     for (j = 0; j < numberOfNames; j++, ptr++) {
          DEBUG(*ptr);
+         for(int k=0; k<objectList.size(); k++){
+             if(objectList.at(k)->GetObjectFrameworkID() == *ptr){
+                 objectList.at(k)->Select();
+                 selectedObject = objectList.at(k);
+             }
+             else
+                 objectList.at(k)->Unselect();
+         }
      }
 }
 
@@ -95,6 +103,12 @@ void GlAll::SelectObject(GLint x, GLint y)
 
     if(hits > 0){
         ProcessHits(hits, selectBuff);  //  选择结果处理
+    }
+    else{
+        for(int k=0; k<objectList.size(); k++){
+            objectList.at(k)->Unselect();
+        }
+        selectedObject = NULL;
     }
 
 }
@@ -220,6 +234,39 @@ GLuint GlAll::load_texture(const char* file_name) {
     return texture_ID;
 }
 
+
+void GlAll::TextureColorkey(GLubyte r, GLubyte g, GLubyte b, GLubyte threshold)
+{
+    GLint width, height;
+    GLubyte* pixels = 0;
+    // 获得纹理的大小信息
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
+    // 分配空间并获得纹理像素
+    pixels = (GLubyte*)malloc(width*height*4);
+    if( pixels == 0 )
+        return;
+
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, pixels);
+    // 修改像素中的 Alpha 值
+    // 其中 pixels[i*4], pixels[i*4+1], pixels[i*4+2], pixels[i*4+3]
+    // 分别表示第 i 个像素的蓝、绿、红、Alpha 四种分量,0 表示最小,255 表示最大
+    {
+        GLint i;
+        GLint count = width * height;
+        for(i=0; i<count; ++i){
+            if( abs(pixels[i*4] - b) <= threshold
+             && abs(pixels[i*4+1] - g) <= threshold
+             && abs(pixels[i*4+2] - r) <= threshold )
+                pixels[i*4+3] = 0;
+            else
+                pixels[i*4+3] = 255;
+        }
+    }
+    // 将修改后的像素重新设置到纹理中,释放内存
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, pixels);
+    free(pixels);
+}
 
 GLuint GlAll::GenerateTex()
 {
@@ -512,6 +559,9 @@ void GlAll::glAllInit()
     texMonet = load_texture(MONET);
     texCustom = GenerateTex();
     texNightSky = load_texture(NIGHTSKY);
+    texBalcony = load_texture(BALCONY);
+    glBindTexture(GL_TEXTURE_2D, texBalcony);
+    TextureColorkey(255,255,255,20);
 
 
     eye[0] = 0;
@@ -530,7 +580,7 @@ void GlAll::glAllInit()
     sideAmount = 0;
     updownAmount = 0;
 
-    selectedObject = -1;
+    selectedObject = NULL;
 
 
     glEnable(GL_DEPTH_TEST);
@@ -554,6 +604,9 @@ void GlAll::glAllInit()
 
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 
+
+
+    SetupScene();
     tableLamp.SetupRC();
 
     return;

@@ -1,6 +1,8 @@
 #ifndef GLOBJECT_H
 #define GLOBJECT_H
 
+#include <string>
+
 #include <GLUT/glut.h>
 
 #include "objfile.h"
@@ -19,8 +21,13 @@ public:
 
     int GetObjectFrameworkID(){ return objectFrameworkID; }
 
+    void SetObjectFrameworkName(std::string name){ objectFrameworkName = name; }
+    std::string GetObjectFrameworkName(){ return objectFrameworkName; }
+
     void SetDimension(GLfloat p_length, GLfloat p_width, GLfloat p_height);
-    GLfloat *GetDimension() const;
+    Dimension3f GetDimension() const;
+    void SetEnvelopingDimension(GLfloat p_length, GLfloat p_width, GLfloat p_height);
+    Dimension3f GetEnvelopingDimension() { }
 
     void SetScale(GLfloat coefficient){ scaleCoefficient = coefficient; }
     GLfloat GetScale(){ return scaleCoefficient; }
@@ -28,9 +35,9 @@ public:
     void SetPosition(GLfloat x, GLfloat y, GLfloat z);
     void MovePosition(GLfloat dx, GLfloat dy, GLfloat dz);
 
-    GLfloat* GetPosition() const;
+    Point3f GetPosition() const;
 
-    void SetRotation(int rx, int ry, int rz);
+    void SetRotation(int drx, int dry, int drz);
 
     void SetTexture(GLuint tex){ texture = tex; }
     GLuint GetTexture() const{ return texture; }
@@ -40,38 +47,22 @@ public:
     void Select(){ isSelected = true; }
     void Unselect(){ isSelected = false; }
 
-
-    // deprecated
-    void Draw(void (*drawfunc)()) {
-        glPushMatrix();
-        glPushAttrib(GL_ALL_ATTRIB_BITS);
-
-
-        glScalef(scaleCoefficient, scaleCoefficient, scaleCoefficient);
-        glTranslatef(position_x, position_y, position_z);
-
-        glBindTexture(GL_TEXTURE_2D, texture);
-
-        (*drawfunc)();
-
-        // draw the framework
-        glScalef(length, width, height);
-        glutWireCube(1.0);
-
-        glPopAttrib();
-        glPopMatrix();
-    }
-
     //bool isInFramework(Point3f point);
+
+    virtual void Draw(GLenum drawMode = GL_RENDER) = 0;
 
 protected:
     int objectFrameworkID;
+    std::string objectFrameworkName;
 
     void SetDrawEnv(GLenum drawMode = GL_RENDER);
     void UnsetDrawEnv();
 
+
 private:
     bool isSelected;
+    // envoloping cube dimension
+    GLfloat en_length, en_width, en_height;
 
     // width:z, length:x, height:y
     GLfloat length, width, height;
@@ -97,9 +88,10 @@ class Girl:public ObjectFramework
 {
 public:
     Girl(){
-        Select();
+        //Select();
         isFileRead = false;
-        SetScale(5.0);
+        SetScale(3.0);
+        SetEnvelopingDimension(0.8, 0.2, 1.0);
     }
     ~Girl(){}
 
@@ -108,7 +100,7 @@ public:
             girl.ReadFile(OBJ_FILE_GIRL);
 
         SetDrawEnv(drawMode);
-        glTranslatef(0.,-0.5,0.);
+        glTranslatef(0.,-0.5,-0.05);
         glScalef(0.5,0.5,0.5);
         girl.DrawModel();
         UnsetDrawEnv();
@@ -132,7 +124,7 @@ public:
         SetDrawEnv(drawMode);
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
-        glutWireCube(1.0);
+        glutSolidCube(1.0);
         glPopMatrix();
         UnsetDrawEnv();
     }
@@ -222,10 +214,12 @@ public:
 class ModelPrism:public ObjectFramework
 {
 public:
-    ModelPrism(){}
+    ModelPrism(){ num = 7;}
     ~ModelPrism(){}
 
-    void Draw(int num, GLenum drawMode = GL_RENDER){
+    void SetSideCount(int count){ num = count; }
+
+    void Draw(GLenum drawMode = GL_RENDER){
         SetDrawEnv(drawMode);
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
@@ -256,15 +250,21 @@ public:
         glPopMatrix();
         UnsetDrawEnv();
     }
+
+private:
+    int num;
 };
 
 class ModelFrustum:public ObjectFramework
 {
 public:
-    ModelFrustum(){}
+    ModelFrustum(){ num = 7; ratio = 0.5; }
     ~ModelFrustum(){}
 
-    void Draw(int num, float ratio, GLenum drawMode = GL_RENDER){
+    void SetSideCount(int count){ num = count; }
+    void SetRatio(GLfloat r){ ratio = r; }
+
+    void Draw(GLenum drawMode = GL_RENDER){
         SetDrawEnv(drawMode);
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
@@ -297,6 +297,10 @@ public:
         glPopMatrix();
         UnsetDrawEnv();
     }
+
+private:
+    int num;
+    float ratio;
 };
 
 

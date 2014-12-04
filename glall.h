@@ -18,9 +18,6 @@
 #define ZOOM_THRESHOLD 0.000001
 
 
-//void SetupObjectList(){
-
-//}
 
 class GlAll{
 public:
@@ -35,7 +32,7 @@ public:
 public:
     void init();
     void idle();
-    void redraw(GLenum mode=GL_RENDER);
+    void redraw(GLenum drawMode=GL_RENDER);
     void reshape(int width, int height);
     void updateView(int width, int height);
     void glAllInit();
@@ -51,10 +48,24 @@ public:
 
     void change_light(int num, float value[4], LightParam param = Diffuse);
 
-
-    Girl girl;
-
-
+    void move(int x, int y, int z){
+        DEBUG("move"<<x<<" "<<y<<" "<<z);
+        if(selectedObject == NULL) return;
+        selectedObject->MovePosition(x/100.0,y/100.0,z/100.0);
+    }
+    void rotate(int x, int y, int z){
+        DEBUG("rotate"<<x<<" "<<y<<" "<<z);
+        if(selectedObject == NULL) return;
+        selectedObject->SetRotation(x/5.0,y/5.0,z/5.0);
+    }
+    void scale(int s) {
+        DEBUG("scale"<<s);
+        if(selectedObject == NULL) return;
+        selectedObject->SetScale(s/100.0);
+    }
+    void change_texture(int value){
+        ;
+    }
 
 private:
 
@@ -79,6 +90,7 @@ private:
     GLuint texMonet;
     GLuint texCustom;
     GLuint texNightSky;
+    GLuint texBalcony;
 
     // view control
     float eye[3];
@@ -92,17 +104,22 @@ private:
 
 
     vector<ObjectFramework*> objectList;
-    int selectedObject;
+    ObjectFramework* selectedObject;
+    //Girl* girl;
+
+    ModelCube cube;
 
     Nurbs tableLamp;
 
 
     GLuint load_texture(const char* file_name);
+    void TextureColorkey(GLubyte r, GLubyte g, GLubyte b, GLubyte threshold);
     GLuint GenerateTex();
 
     void MoveControl();
     void MoveEye();
 
+    void SetupScene();
 
     void DrawCrosshair();
     void drawBox(GLfloat size, GLenum type);
