@@ -187,6 +187,7 @@ void GLWidget::keyPress(QKeyEvent *event)
 void GLWidget::paintGL()
 {
     glAll.redraw();
+
     return;
 
 
@@ -236,6 +237,10 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     this->setMouseTracking(true);
     QApplication::setOverrideCursor(Qt::BlankCursor);
     QApplication::setOverrideCursor(Qt::BlankCursor);
+
+    if(isGLWidgetFocued == true){
+        glAll.SelectObject(this->width()/2, this->height()/2);
+    }
 
     DEBUG("gl widget focus got");
 

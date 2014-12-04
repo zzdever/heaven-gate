@@ -7,21 +7,7 @@ Nurbs::Nurbs(){
     spin_y = 0;/*整个图形绕y轴旋转角度*/
     spin_z = 0;/*整个图形绕z轴旋转角度*/
 
-    pNurb_base = gluNewNurbsRenderer();/*设置Nurbs对象*/
-    pNurb_pipe = gluNewNurbsRenderer();
-    pNurb_lamp = gluNewNurbsRenderer();
-
-    /*设置NURBS的属性*/
-    gluNurbsProperty(pNurb_base, GLU_SAMPLING_TOLERANCE, 25.0f);/*设置采样容差，定义线框的精细程度*/
-    gluNurbsProperty(pNurb_pipe, GLU_SAMPLING_TOLERANCE, 25.0f);/*设置采样容差，定义线框的精细程度*/
-    gluNurbsProperty(pNurb_lamp, GLU_SAMPLING_TOLERANCE, 25.0f);/*设置采样容差，定义线框的精细程度*/
-
-
-    glEnable(GL_COLOR_MATERIAL);
-
-    glEnable(GL_AUTO_NORMAL);/*自动生成法线*/
-
-
+    drawlist = -1;
 }
 
 
@@ -52,13 +38,19 @@ void Nurbs::DrawPoints(void)
 
 
 //用于绘制台灯
-void Nurbs::DrawTableLamp(void)
+GLint Nurbs::GenDrawList()
 {
+    GLint lid = 0;
+    /*
+    lid = glGenLists(1);
+    glNewList(lid, GL_COMPILE);
+    */
+
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
     //glMatrixMode(GL_MODELVIEW);
-    //glPushMatrix();
-    glScalef(0.5, 0.5, 0.5);
+    glPushMatrix();
+    glScalef(0.05, 0.05, 0.05);
 
     /*特殊键控制网格旋转*/
     glRotatef(spin_x, 1.0, 0.0, 0.0);//绕x轴旋转
@@ -148,9 +140,49 @@ void Nurbs::DrawTableLamp(void)
     glPopMatrix();
 
     //    DrawPoints();
-    //glPopMatrix();/*重置模型视图矩阵*/
+    glPopMatrix();/*重置模型视图矩阵*/
 
     glPopAttrib();
+
+    /*
+    glEndList();
+    */
+    return lid;
+}
+
+
+void Nurbs::DrawTableLamp()
+{
+    /*
+    if(drawlist<0){
+        drawlist = GenDrawList();
+    }
+    */
+    GenDrawList();
+    //glCallList(drawlist);
+
+    return;
+}
+
+
+
+void Nurbs::SetupRC()
+{
+    /*开启颜色跟踪*/
+    glEnable(GL_COLOR_MATERIAL);
+    /*自动生成法线*/
+    glEnable(GL_AUTO_NORMAL);
+
+    /*设置Nurbs对象*/
+    pNurb_base = gluNewNurbsRenderer();
+    pNurb_pipe = gluNewNurbsRenderer();
+    pNurb_lamp = gluNewNurbsRenderer();
+
+
+    /*设置NURBS的属性*/
+    gluNurbsProperty(pNurb_base, GLU_SAMPLING_TOLERANCE, 25.0f);/*设置采样容差，定义线框的精细程度*/
+    gluNurbsProperty(pNurb_pipe, GLU_SAMPLING_TOLERANCE, 25.0f);/*设置采样容差，定义线框的精细程度*/
+    gluNurbsProperty(pNurb_lamp, GLU_SAMPLING_TOLERANCE, 25.0f);/*设置采样容差，定义线框的精细程度*/
 }
 
 

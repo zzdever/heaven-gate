@@ -50,6 +50,10 @@ public:
     void mouse_press(int button,int state,int x,int y);
     void mouse_move(int dx, int dy);
 
+    void SelectObject(GLint x, GLint y);
+    void draw(GLenum model=GL_RENDER);
+
+
     void change_light(int num, float value[4], LightParam param = Diffuse);
 
 private:
@@ -98,14 +102,15 @@ private:
     void MoveEye();
 
 
+    void DrawCrosshair();
     void drawBox(GLfloat size, GLenum type);
     void glutSolidCube(GLdouble size);
-    void DrawCone(float x, float y, float z);
     void DrawSky();
     void Draw_Triangle();
     void Draw_Leg();
 
     void Radio();
+
 
 };
 

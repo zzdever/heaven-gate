@@ -13,6 +13,7 @@ public:
     Nurbs();
     ~Nurbs(){}
 
+    void SetupRC();
     void DrawTableLamp();
 
 private:
@@ -47,6 +48,7 @@ private:
             { 4.5f, -2.0f, -3.0f },
             { 4.5f, 2.0f, -3.0f },
             { 3.0f, 3.0f, -3.0f }}};
+
 
     //台灯弯曲管的控制点
     GLfloat ctrlPoints_pipe[5][5][3] = {
@@ -124,9 +126,13 @@ private:
     GLfloat v_knots_lamp[12] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
 
 
+    GLint drawlist;
+
+
     void DrawPoints();
     void Draw_base();
 
+    GLint GenDrawList();
 
 };
 

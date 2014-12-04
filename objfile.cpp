@@ -2,6 +2,14 @@
 
 
 void ObjFileSupport::ReadFile(string filename) {
+
+    if(this->filename == filename){
+        return;
+    }
+    else{
+        this->filename = filename;
+    }
+
     GLfloat x, y, z;
     string type;
     string buffer;
@@ -97,15 +105,21 @@ void ObjFileSupport::DrawModel(){
 
 
 GLint ObjFileSupport::GenDrawList(){
-    GLint lid = glGenLists(1);
+    GLint lid = 0;
+    lid = glGenLists(1);
     glNewList(lid, GL_COMPILE);
 
     glPushMatrix();
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+//    GLfloat color[] = {0, 0, 0, 1.0};
+//    glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,color);
+//    glMaterialfv(GL_FRONT, GL_SPECULAR, color);
+
 
     for (int i=0; i<f_num; i++) {
         glBegin(GL_TRIANGLES);
-        glColor3f(0, 0, 0);
+        glColor3f(0.78125, 0.70588, 0.49804);
+
         glNormal3f(vn.at(fn.at(i).at(0) -1).at(0), vn.at(fn.at(i).at(0) -1).at(1), vn.at(fn.at(i).at(0) -1).at(2));
         glVertex3f(v.at(fv.at(i).at(0) -1).at(0)/scale, v.at(fv.at(i).at(0) -1).at(1)/scale, v.at(fv.at(i).at(0) -1).at(2)/scale);
 
@@ -117,10 +131,11 @@ GLint ObjFileSupport::GenDrawList(){
         glEnd();
     }
 
-    glPopAttrib();
+
     glPopMatrix();
 
     glEndList();
+
     return lid;
 
 }

@@ -23,29 +23,138 @@ void setMatirial(const GLfloat mat_diffuse[4], GLfloat mat_shininess)
 }
 
 
-void DrawCube(){
+void ModelCube(){
     glutSolidCube(1.0);
 }
 
-void DrawSphere(){
+void ModelSphere(){
     glutSolidSphere(0.5, 60, 60);
 }
 
-void DrawCylinder(){
+void ModelCylinder(){
+    const int grain = 60;
     glPushMatrix();
     glRotatef(-90,1,0,0);
     glTranslatef(0,0,-0.5);
-    gluCylinder(gluNewQuadric(), 0.5, 0.5, 1.0, 60, 60);
+    gluCylinder(gluNewQuadric(), 0.5, 0.5, 1.0, grain, grain);
+
+    // top
+    glBegin(GL_POLYGON);
+    for(int i=0; i<grain; i++){
+        glVertex3f(0.5*cos(PI*2/grain*i), 0.5*sin(PI*2/grain*i), 1.0);
+    }
+    glEnd();
+
+    // bottom
+    glBegin(GL_POLYGON);
+    for(int i=0; i<grain; i++){
+        glVertex3f(0.5*cos(PI*2/grain*i), 0.5*sin(PI*2/grain*i), 0.);
+    }
+    glEnd();
+
     glPopMatrix();
 }
 
-void DrawCone2(){
+void ModelCone(){
+    const int grain = 60;
     glPushMatrix();
     glRotatef(-90,1,0,0);
     glTranslatef(0,0,-0.5);
-    glutSolidCone(0.5, 1.0, 60, 60);
+    glutSolidCone(0.5, 1.0, grain, grain);
+
+    // bottom
+    glBegin(GL_POLYGON);
+    for(int i=0; i<grain; i++){
+        glVertex3f(0.5*cos(PI*2/grain*i), 0.5*sin(PI*2/grain*i), 0.);
+    }
+    glEnd();
+
     glPopMatrix();
 }
+
+
+void ModelPrism(int num){
+    glPushMatrix();
+
+    for(int i=0; i<num; i++){
+        glBegin(GL_POLYGON);
+        glVertex3f(0.5*cos(PI*2/num*i), 0.5, 0.5*sin(PI*2/num*i));
+        glVertex3f(0.5*cos(PI*2/num*i), -0.5, 0.5*sin(PI*2/num*i));
+        glVertex3f(0.5*cos(PI*2/num*(i+1)), -0.5, 0.5*sin(PI*2/num*(i+1)));
+        glVertex3f(0.5*cos(PI*2/num*(i+1)), 0.5, 0.5*sin(PI*2/num*(i+1)));
+        glEnd();
+    }
+
+    // top
+    glBegin(GL_POLYGON);
+    for(int i=0; i<num; i++){
+        glVertex3f(0.5*cos(PI*2/num*i), 0.5, 0.5*sin(PI*2/num*i));
+    }
+    glEnd();
+
+    // bottom
+    glBegin(GL_POLYGON);
+    for(int i=0; i<num; i++){
+        glVertex3f(0.5*cos(PI*2/num*i), -0.5, 0.5*sin(PI*2/num*i));
+    }
+    glEnd();
+
+    glPopMatrix();
+}
+
+
+void ModelFrustum(int num, float ratio){
+    glPushMatrix();
+    if(ratio>1.0) ratio = 1.0;
+
+    // sides
+    for(int i=0; i<num; i++){
+        glBegin(GL_POLYGON);
+        glVertex3f(ratio*0.5*cos(PI*2/num*i), 0.5, ratio*0.5*sin(PI*2/num*i));
+        glVertex3f(0.5*cos(PI*2/num*i), -0.5, 0.5*sin(PI*2/num*i));
+        glVertex3f(0.5*cos(PI*2/num*(i+1)), -0.5, 0.5*sin(PI*2/num*(i+1)));
+        glVertex3f(ratio*0.5*cos(PI*2/num*(i+1)), 0.5, ratio*0.5*sin(PI*2/num*(i+1)));
+        glEnd();
+    }
+
+    // top
+    glBegin(GL_POLYGON);
+    for(int i=0; i<num; i++){
+        glVertex3f(ratio*0.5*cos(PI*2/num*i), 0.5, ratio*0.5*sin(PI*2/num*i));
+    }
+    glEnd();
+
+    // bottom
+    glBegin(GL_POLYGON);
+    for(int i=0; i<num; i++){
+        glVertex3f(0.5*cos(PI*2/num*i), -0.5, 0.5*sin(PI*2/num*i));
+    }
+    glEnd();
+
+    glPopMatrix();
+}
+
+
+
+void drawprism(){
+    ModelPrism(12);
+}
+
+void DrawStage(){
+    float radius = 5.0;
+    for(int i=0; i<6; i++){
+        glPushMatrix();
+        glScalef(radius,0.3,radius);
+        glTranslatef(0., i*0.3, 0.);
+        ModelFrustum(8, 0.9);
+        glPopMatrix();
+        radius *= 0.8;
+    }
+}
+
+
+
+
 
 void GlAll::redraw()
 {
@@ -54,6 +163,11 @@ void GlAll::redraw()
 
     MoveControl();
     MoveEye();
+
+
+    draw();
+
+    return;
 
     if (bWire) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -68,33 +182,53 @@ void GlAll::redraw()
     glEnable(GL_LIGHTING);
     glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
 
+    DrawCrosshair();
 
+    // lights
     for(int i=0;i<LIGHT_COUNT;i++){
         lights[i].DrawLight();
     }
 
 
-    tableLamp.DrawTableLamp();
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-    return;
 
     ObjectFramework cube(1,1,1);
     cube.SetPosition(0,0,2);
     cube.SetScale(0.5);
     cube.SetTexture(texCrack);
-    cube.Draw(DrawCube);
+    cube.Draw(ModelCube);
+
 
     ObjectFramework cylinder(1,1,1);
     cylinder.SetPosition(-2,0,2);
-    cylinder.Draw(DrawCylinder);
+    cylinder.Draw(ModelCylinder);
 
     ObjectFramework cone(1,1,1);
     cone.SetPosition(2,0,2);
     cone.SetScale(1.5);
-    cone.Draw(DrawCone2);
+    cone.Draw(ModelCone);
+
+    ObjectFramework prism(1,3,1);
+    prism.SetPosition(0,2,2);
+    prism.SetScale(1);
+    prism.Draw(drawprism);
 
 
+    ObjectFramework stage(3,0.5,3);
+    stage.SetPosition(0,0,0);
+    stage.SetScale(1);
+    stage.Draw(DrawStage);
+
+    ObjectFramework goddess(3,0.5,3);
+    goddess.SetPosition(0,3,0);
+    goddess.SetScale(1);
+    goddess.SetDrawEnv();
     objfile.DrawModel();
+    goddess.UnsetDrawEnv();
+
+
+    glPopAttrib();
 
 
 
@@ -105,7 +239,7 @@ void GlAll::redraw()
 
 
     glPushAttrib(GL_ALL_ATTRIB_BITS);   // save all attributes
-    Draw_Triangle();						// Draw triangle
+    //Draw_Triangle();						// Draw triangle
 
 
 
@@ -128,6 +262,7 @@ void GlAll::redraw()
 
     if (bAnim) fRotate    += 0.5f;
 
+
     // NOTE QOpenGLContext::swapBuffers() called with non-exposed window, behavior is undefined
     //glutSwapBuffers();
 }
@@ -135,6 +270,46 @@ void GlAll::redraw()
 
 
 
+void GlAll::DrawCrosshair()
+{
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(-wWidth,wWidth,-wHeight,wHeight,-1.0,10);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+
+    {
+        glLineWidth(1);
+        glEnable(GL_LINE_SMOOTH);
+        glHint(GL_LINE_SMOOTH,GL_NICEST);
+
+        glColor4f(0.7, 0.7, 0.7, 0.7);
+
+        glBegin(GL_LINES);
+        glVertex2f(-wHeight/50,0.);
+        glVertex2f(wHeight/50,0.);
+        glEnd();
+        glBegin(GL_LINES);
+        glVertex2f(0.,-wHeight/50);
+        glVertex2f(0.,wHeight/50);
+        glEnd();
+    }
+
+
+    // Making sure we can render 3d again
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+
+    glPopAttrib();
+}
 
 
 
@@ -241,10 +416,6 @@ void GlAll::glutSolidCube(GLdouble size)
 }
 
 
-void GlAll::DrawCone(float x, float y, float z)
-{
-    glutSolidCone(0.5, 0.7, 10, 10);
-}
 
 
 void GlAll::DrawSky()

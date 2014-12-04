@@ -68,6 +68,26 @@ public:
     void SetMaterial(GLenum param, const GLfloat* params);
 
 
+    void SetDrawEnv(){
+        glPushMatrix();
+        glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+
+        glScalef(scaleCoefficient, scaleCoefficient, scaleCoefficient);
+        glTranslatef(position_x, position_y, position_z);
+
+        glBindTexture(GL_TEXTURE_2D, texture);
+    }
+
+    void UnsetDrawEnv(){
+        // draw the framework
+        glScalef(length, width, height);
+        glutWireCube(1.0);
+
+        glPopAttrib();
+        glPopMatrix();
+    }
+
     void Draw(void (*drawfunc)()) {
         glPushMatrix();
         glPushAttrib(GL_ALL_ATTRIB_BITS);

@@ -2,6 +2,8 @@
 #define MISC_H
 
 
+#include <QDebug>
+
 #include <iostream>
 #include <math.h>
 

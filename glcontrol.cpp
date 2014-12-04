@@ -4,6 +4,115 @@
 #include <QThread>
 
 
+void GlAll::draw(GLenum model)
+{
+    if(model==GL_SELECT){
+        glColor3f(1.0,0.0,0.0);
+        glLoadName(100);
+        glPushMatrix();
+        glTranslatef(-5, 0.0, 10.0);
+        glBegin(GL_QUADS);
+        glVertex3f(-1, -1, 0);
+        glVertex3f( 1, -1, 0);
+        glVertex3f( 1, 1, 0);
+        glVertex3f(-1, 1, 0);
+        glEnd();
+        glPopMatrix();
+
+        glColor3f(0.0,0.0,1.0);
+        glLoadName(101);
+        glPushMatrix();
+        glTranslatef(5, 0.0, -10.0);
+        glBegin(GL_QUADS);
+        glVertex3f(-1, -1, 0);
+        glVertex3f( 1, -1, 0);
+        glVertex3f( 1, 1, 0);
+        glVertex3f(-1, 1, 0);
+        glEnd();
+
+        glPopMatrix();
+    }
+    else{
+        glColor3f(1.0,0.0,0.0);
+        glPushMatrix();
+        glTranslatef(-5, 0.0, -5.0);
+        glBegin(GL_QUADS);
+        glVertex3f(-1, -1, 0);
+        glVertex3f( 1, -1, 0);
+        glVertex3f( 1, 1, 0);
+        glVertex3f(-1, 1, 0);
+        glEnd();
+        glPopMatrix();
+
+        glColor3f(0.0,0.0,1.0);
+        glPushMatrix();
+        glTranslatef(5, 0.0, -10.0);
+        glBegin(GL_QUADS);
+        glVertex3f(-1, -1, 0);
+        glVertex3f( 1, -1, 0);
+        glVertex3f( 1, 1, 0);
+        glVertex3f(-1, 1, 0);
+        glEnd();
+        glPopMatrix();
+    }
+}
+
+
+
+void GlAll::SelectObject(GLint x, GLint y)
+
+{
+    x=0;y=0;
+
+    GLuint selectBuff[32]={0};//创建一个保存选择结果的数组
+    GLint hits, viewport[4];
+
+
+    glGetIntegerv(GL_VIEWPORT, viewport); //获得viewport
+    glSelectBuffer(64, selectBuff); //告诉OpenGL初始化  selectbuffer
+    glRenderMode(GL_SELECT);    //进入选择模式
+
+    glInitNames();  //初始化名字栈
+    glPushName(0);  //在名字栈中放入一个初始化名字，这里为‘0’
+
+
+    glMatrixMode(GL_PROJECTION);    //进入投影阶段准备拾取
+    glPushMatrix();     //保存以前的投影矩阵
+    glLoadIdentity();   //载入单位矩阵
+
+
+    float m[16];
+    glGetFloatv(GL_PROJECTION_MATRIX, m);
+
+    gluPickMatrix( x,           // 设定我们选择框的大小，建立拾取矩阵，就是上面的公式
+                  viewport[3]-y,    // viewport[3]保存的是窗口的高度，窗口坐标转换为OpenGL坐标
+                  2,2,              // 选择框的大小为2，2
+                  viewport          // 视口信息，包括视口的起始位置和大小
+                  );
+
+
+    glGetFloatv(GL_PROJECTION_MATRIX, m);
+    glOrtho(-10, 10, -10, 10, -10, 10);     //拾取矩阵乘以投影矩阵，这样就可以让选择框放大为和视体一样大
+    glGetFloatv(GL_PROJECTION_MATRIX, m);
+
+
+    draw(GL_SELECT);    // 该函数中渲染物体，并且给物体设定名字
+
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();  // 返回正常的投影变换
+    glGetFloatv(GL_PROJECTION_MATRIX, m);
+
+    hits = glRenderMode(GL_RENDER); // 从选择模式返回正常模式,该函数返回选择到对象的个数
+    if(hits > 0)
+        std::cout<<hits<<"ssssssssssssssssssssssssss selected"<<std::endl;
+
+        //processSelect(selectBuff);  //  选择结果处理
+
+}
+
+
+
 
 // judge whether n is a number of power of 2
 int power_of_two(int n) {
@@ -347,6 +456,7 @@ void GlAll::MoveControl()
 
 void GlAll::MoveEye()
 {
+
     eye_center[0] = eye[0] + sin(eye_theta[0]*EYE_ROTATION_COEFFICIENT/180*PI);
     eye_center[1] = eye[1] - tan(eye_theta[1]*EYE_ROTATION_COEFFICIENT/180*PI);
     eye_center[2] = eye[2] - cos(eye_theta[0]*EYE_ROTATION_COEFFICIENT/180*PI);
@@ -439,6 +549,8 @@ void GlAll::glAllInit()
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glShadeModel(GL_SMOOTH);
+
 
 
 //    glEnable(GL_POINT_SMOOTH);
@@ -455,6 +567,7 @@ void GlAll::glAllInit()
 
     objfile.ReadFile("/Users/ying/Documents/DEV/qt_prj/gl/girl.obj");
 
+    tableLamp.SetupRC();
 
     return;
 }
@@ -465,6 +578,7 @@ void GlAll::updateView(int width, int height)
 
     glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
     glLoadIdentity();									// Reset The Projection Matrix
+
 
     float whRatio = (GLfloat)width/(GLfloat)height;
     if (bPersp) {

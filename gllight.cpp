@@ -7,16 +7,10 @@ GlLight::GlLight()
 {
     lightNum = GL_LIGHT0 + (lightCount++);
 
-    position[0] = 1.5*cos(PI*360/LIGHT_COUNT*lightCount/180);
-    position[1] = 1.3;
-    position[2] = 1.5*sin(PI*360/LIGHT_COUNT*lightCount/180);
-    position[3] = 1.0;
+    SetPosition(1.5*cos(PI*360/LIGHT_COUNT*lightCount/180), 1.3,
+                1.5*sin(PI*360/LIGHT_COUNT*lightCount/180), 1.0);
 
-
-    color[0] = 1.0;
-    color[1] = 1.0;
-    color[2] = 1.0;
-    color[3] = 1.0;
+    SetColor(1.0,1.0,1.0,1.0);
 
     /*
     ambient[0] = 1.0;
@@ -61,16 +55,13 @@ void GlLight::DrawLight()
 
     glPushMatrix();
 
-    glLightfv(lightNum, GL_POSITION, position);
-    glLightfv(lightNum, GL_AMBIENT, color);
-    glLightfv(lightNum, GL_DIFFUSE, color);
-    glLightfv(lightNum, GL_SPECULAR, color);
+
 
 
     glTranslatef(position[0], position[1], position[2]);
 
     glPushAttrib(GL_ALL_ATTRIB_BITS);
-    glMaterialfv(GL_FRONT, GL_EMISSION, color);
+    //glMaterialfv(GL_FRONT, GL_EMISSION, color);
     glMaterialfv(GL_FRONT, GL_AMBIENT, color);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
     glMaterialfv(GL_FRONT, GL_SPECULAR, color);
@@ -87,6 +78,9 @@ void GlLight::SetPosition(float x, float y, float z, float w)
     position[1] = y;
     position[2] = z;
     position[3] = w;
+
+    glLightfv(lightNum, GL_POSITION, position);
+
 }
 
 void GlLight::MovePosition(float dx, float dy, float dz, float dw)
@@ -101,6 +95,10 @@ void GlLight::SetColor(float r, float g, float b, float a)
     color[1] = g;
     color[2] = b;
     color[3] = a;
+
+    glLightfv(lightNum, GL_AMBIENT, color);
+    glLightfv(lightNum, GL_DIFFUSE, color);
+    glLightfv(lightNum, GL_SPECULAR, color);
 }
 
 
