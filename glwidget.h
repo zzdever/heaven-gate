@@ -92,6 +92,49 @@ public slots:
         changeLightDriver();
     }
 
+    void changeTexture(int value){
+        glAll.change_texture(value);
+    }
+    void moveX(int value){
+        if(value == 0)
+            return;
+        static_cast<QSlider*>(sender())->setValue(0);
+        glAll.move(value,0,0);
+    }
+    void moveY(int value){
+        if(value == 0)
+            return;
+        static_cast<QSlider*>(sender())->setValue(0);
+        glAll.move(0,value,0);
+    }
+    void moveZ(int value){
+        if(value == 0)
+            return;
+        static_cast<QSlider*>(sender())->setValue(0);
+        glAll.move(0,0,value);
+    }
+    void rotateX(int value){
+        if(value == 0)
+            return;
+        static_cast<QSlider*>(sender())->setValue(0);
+        glAll.rotate(value,0,0);
+    }
+    void rotateY(int value){
+        if(value == 0)
+            return;
+        static_cast<QSlider*>(sender())->setValue(0);
+        glAll.rotate(0,value,0);
+    }
+    void rotateZ(int value){
+        if(value == 0)
+            return;
+        static_cast<QSlider*>(sender())->setValue(0);
+        glAll.rotate(0,0,value);
+    }
+    void scale(int value){
+        glAll.scale(value);
+    }
+
 
 
 };

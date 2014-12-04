@@ -16,15 +16,35 @@
 #define DEBUGS(MESSAGE) {if(TEST){std::cout<<MESSAGE;}}
 
 
+//==========================================
+// File path definition
+// You may need to change this to compile
+#define CRACK "/Users/ying/Crack.bmp"
+#define SPOT "/Users/ying/Spot.bmp"
+#define MONET "/Users/ying/Monet.bmp"
+#define NIGHTSKY "/Users/ying/starskyrecur.bmp"
+#define BALCONY "/Users/ying/balcony.bmp"
+
+#define OBJ_FILE_GIRL "/Users/ying/Documents/DEV/qt_prj/gl/girl.obj"
+
+//==========================================
+
+
 #define PI 3.1415926
 
 #define LIGHT_COUNT 1
 
 
 struct Point3f{
-    float x;
-    float y;
-    float z;
+    GLfloat x;
+    GLfloat y;
+    GLfloat z;
+};
+
+struct Dimension3f{
+    GLfloat length;
+    GLfloat width;
+    GLfloat height;
 };
 
 enum ObjectType{

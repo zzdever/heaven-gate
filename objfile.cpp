@@ -94,12 +94,13 @@ void ObjFileSupport::ReadFile(string filename) {
     fin.close();
 
     drawlist = GenDrawList();
+
+    DEBUG("obj file read done, draw list gen done");
 }
 
 
 void ObjFileSupport::DrawModel(){
     glCallList(drawlist);
-
     return;
 }
 

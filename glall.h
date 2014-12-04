@@ -2,24 +2,15 @@
 #define GLALL_H
 
 
+#include <vector>
+
 #include "globject.h"
 #include "gllight.h"
 #include "misc.h"
-#include "objfile.h"
 #include "nurbs.h"
 
 
-//==========================================
-// File path definition
-// You may need to change this to compile
-#define CRACK "/Users/ying/Crack.bmp"
-#define SPOT "/Users/ying/Spot.bmp"
-#define MONET "/Users/ying/Monet.bmp"
-#define NIGHTSKY "/Users/ying/starskyrecur.bmp"
-//==========================================
-
 #define BMP_Header_Length 54
-
 
 #define EYE_ROTATION_COEFFICIENT 0.05
 #define EYE_STEP_COEFFICIENT 0.07
@@ -41,7 +32,7 @@ public:
 public:
     void init();
     void idle();
-    void redraw();
+    void redraw(GLenum drawMode=GL_RENDER);
     void reshape(int width, int height);
     void updateView(int width, int height);
     void glAllInit();
@@ -51,10 +42,30 @@ public:
     void mouse_move(int dx, int dy);
 
     void SelectObject(GLint x, GLint y);
-    void draw(GLenum model=GL_RENDER);
+    void ProcessHits(GLint hits, GLuint buffer[]);
+    std::vector<GLdouble> screen2world(int x, int y);
 
 
     void change_light(int num, float value[4], LightParam param = Diffuse);
+
+    void move(int x, int y, int z){
+        DEBUG("move"<<x<<" "<<y<<" "<<z);
+        if(selectedObject == NULL) return;
+        selectedObject->MovePosition(x/100.0,y/100.0,z/100.0);
+    }
+    void rotate(int x, int y, int z){
+        DEBUG("rotate"<<x<<" "<<y<<" "<<z);
+        if(selectedObject == NULL) return;
+        selectedObject->SetRotation(x/5.0,y/5.0,z/5.0);
+    }
+    void scale(int s) {
+        DEBUG("scale"<<s);
+        if(selectedObject == NULL) return;
+        selectedObject->SetScale(s/100.0);
+    }
+    void change_texture(int value){
+        ;
+    }
 
 private:
 
@@ -79,6 +90,7 @@ private:
     GLuint texMonet;
     GLuint texCustom;
     GLuint texNightSky;
+    GLuint texBalcony;
 
     // view control
     float eye[3];
@@ -91,16 +103,23 @@ private:
     float updownAmount;
 
 
-    ObjFileSupport objfile;
+    vector<ObjectFramework*> objectList;
+    ObjectFramework* selectedObject;
+    //Girl* girl;
+
+    ModelCube cube;
+
     Nurbs tableLamp;
 
 
     GLuint load_texture(const char* file_name);
+    void TextureColorkey(GLubyte r, GLubyte g, GLubyte b, GLubyte threshold);
     GLuint GenerateTex();
 
     void MoveControl();
     void MoveEye();
 
+    void SetupScene();
 
     void DrawCrosshair();
     void drawBox(GLfloat size, GLenum type);
@@ -110,7 +129,6 @@ private:
     void Draw_Leg();
 
     void Radio();
-
 
 };
 

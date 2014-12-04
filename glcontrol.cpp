@@ -4,8 +4,9 @@
 #include <QThread>
 
 
-void GlAll::draw(GLenum model)
+void GlAll::ProcessHits(GLint hits, GLuint buffer[])
 {
+<<<<<<< HEAD
     if(model==GL_SELECT){
         glColor3f(1.0,0.0,0.0);
         glLoadName(100);
@@ -55,61 +56,114 @@ void GlAll::draw(GLenum model)
         glEnd();
         glPopMatrix();
     }
+=======
+    unsigned int i, j;
+    GLuint names, *ptr, minZ, *ptrNames, numberOfNames;
+
+    DEBUG("hits = "<<hits);
+
+    ptr = (GLuint *) buffer;
+    minZ = 0xffffffff;
+    for (i = 0; i < hits; i++) {
+        names = *ptr;
+        ptr++;
+        if (*ptr < minZ) {
+            numberOfNames = names;
+            minZ = *ptr;
+            ptrNames = ptr+2;
+        }
+        ptr += names+2;
+    }
+
+    DEBUG("The closest hit names are ");
+    ptr = ptrNames;
+
+    for (j = 0; j < numberOfNames; j++, ptr++) {
+         DEBUG(*ptr);
+         for(int k=0; k<objectList.size(); k++){
+             if(objectList.at(k)->GetObjectFrameworkID() == *ptr){
+                 objectList.at(k)->Select();
+                 selectedObject = objectList.at(k);
+             }
+             else
+                 objectList.at(k)->Unselect();
+         }
+     }
+>>>>>>> pick
 }
 
 
+vector<GLdouble> GlAll::screen2world(int x, int y)
+{
+    GLint viewport[4];
+    GLdouble modelview[16];
+    GLdouble projection[16];
+    GLfloat winX, winY, winZ;
+    GLdouble posX, posY, posZ;
+
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+    glGetDoublev(GL_PROJECTION_MATRIX, projection);
+    glGetIntegerv(GL_VIEWPORT, viewport);
+
+    winX = (float)x;
+    winY = (float)viewport[3] - (float)y;
+
+    glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
+    gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+
+    vector<GLdouble> v;
+    v.push_back(posX);
+    v.push_back(posY);
+    v.push_back(posZ);
+
+    //GVector v(4, posX, posY, posZ, 1.0);
+    return v;
+}
 
 void GlAll::SelectObject(GLint x, GLint y)
-
 {
-
     GLuint selectBuff[32]={0};//创建一个保存选择结果的数组
     GLint hits, viewport[4];
 
-
     glGetIntegerv(GL_VIEWPORT, viewport); //获得viewport
-    glSelectBuffer(64, selectBuff); //告诉OpenGL初始化  selectbuffer
+    glSelectBuffer(32, selectBuff); //告诉OpenGL初始化  selectbuffer
     glRenderMode(GL_SELECT);    //进入选择模式
 
     glInitNames();  //初始化名字栈
     glPushName(0);  //在名字栈中放入一个初始化名字，这里为‘0’
 
-
     glMatrixMode(GL_PROJECTION);    //进入投影阶段准备拾取
     glPushMatrix();     //保存以前的投影矩阵
     glLoadIdentity();   //载入单位矩阵
 
-
-    float m[16];
-    glGetFloatv(GL_PROJECTION_MATRIX, m);
-
-    gluPickMatrix( x,           // 设定我们选择框的大小，建立拾取矩阵，就是上面的公式
-                  viewport[3]-y,    // viewport[3]保存的是窗口的高度，窗口坐标转换为OpenGL坐标
-                  2,2,              // 选择框的大小为2，2
+    gluPickMatrix(viewport[2]/2,           // 设定我们选择框的大小，建立拾取矩阵，就是上面的公式
+                  viewport[3]/2,    // viewport[3]保存的是窗口的高度，窗口坐标转换为OpenGL坐标
+                  5,5,              // 选择框的大小为5，5
                   viewport          // 视口信息，包括视口的起始位置和大小
                   );
 
 
-    glGetFloatv(GL_PROJECTION_MATRIX, m);
-    glOrtho(-10, 10, -10, 10, -10, 10);     //拾取矩阵乘以投影矩阵，这样就可以让选择框放大为和视体一样大
-    glGetFloatv(GL_PROJECTION_MATRIX, m);
+    float whRatio = (GLfloat)wWidth/(GLfloat)wHeight;
+    gluPerspective(45.0f, whRatio,0.1f,100.0f);
 
-
-    draw(GL_SELECT);    // 该函数中渲染物体，并且给物体设定名字
-
+    redraw(GL_SELECT);
 
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();  // 返回正常的投影变换
-    glGetFloatv(GL_PROJECTION_MATRIX, m);
 
     hits = glRenderMode(GL_RENDER); // 从选择模式返回正常模式,该函数返回选择到对象的个数
-    if(hits > 0)
-        std::cout<<hits<<"ssssssssssssssssssssssssss selected"<<std::endl;
 
-        //processSelect(selectBuff);  //  选择结果处理
+    if(hits > 0){
+        ProcessHits(hits, selectBuff);  //  选择结果处理
+    }
+    else{
+        for(int k=0; k<objectList.size(); k++){
+            objectList.at(k)->Unselect();
+        }
+        selectedObject = NULL;
+    }
 
 }
-
 
 
 
@@ -232,6 +286,39 @@ GLuint GlAll::load_texture(const char* file_name) {
     return texture_ID;
 }
 
+
+void GlAll::TextureColorkey(GLubyte r, GLubyte g, GLubyte b, GLubyte threshold)
+{
+    GLint width, height;
+    GLubyte* pixels = 0;
+    // 获得纹理的大小信息
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
+    // 分配空间并获得纹理像素
+    pixels = (GLubyte*)malloc(width*height*4);
+    if( pixels == 0 )
+        return;
+
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, pixels);
+    // 修改像素中的 Alpha 值
+    // 其中 pixels[i*4], pixels[i*4+1], pixels[i*4+2], pixels[i*4+3]
+    // 分别表示第 i 个像素的蓝、绿、红、Alpha 四种分量,0 表示最小,255 表示最大
+    {
+        GLint i;
+        GLint count = width * height;
+        for(i=0; i<count; ++i){
+            if( abs(pixels[i*4] - b) <= threshold
+             && abs(pixels[i*4+1] - g) <= threshold
+             && abs(pixels[i*4+2] - r) <= threshold )
+                pixels[i*4+3] = 0;
+            else
+                pixels[i*4+3] = 255;
+        }
+    }
+    // 将修改后的像素重新设置到纹理中,释放内存
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, pixels);
+    free(pixels);
+}
 
 GLuint GlAll::GenerateTex()
 {
@@ -524,6 +611,9 @@ void GlAll::glAllInit()
     texMonet = load_texture(MONET);
     texCustom = GenerateTex();
     texNightSky = load_texture(NIGHTSKY);
+    texBalcony = load_texture(BALCONY);
+    glBindTexture(GL_TEXTURE_2D, texBalcony);
+    TextureColorkey(255,255,255,20);
 
 
     eye[0] = 0;
@@ -541,6 +631,8 @@ void GlAll::glAllInit()
     zoomAmount = 0.;
     sideAmount = 0;
     updownAmount = 0;
+
+    selectedObject = NULL;
 
 
     glEnable(GL_DEPTH_TEST);
@@ -564,8 +656,9 @@ void GlAll::glAllInit()
 
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 
-    objfile.ReadFile("/Users/ying/Documents/DEV/qt_prj/gl/girl.obj");
 
+
+    SetupScene();
     tableLamp.SetupRC();
 
     return;
@@ -574,6 +667,7 @@ void GlAll::glAllInit()
 void GlAll::updateView(int width, int height)
 {
     glViewport(0,0,width,height);						// Reset The Current Viewport
+
 
     glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
     glLoadIdentity();									// Reset The Projection Matrix
@@ -584,7 +678,6 @@ void GlAll::updateView(int width, int height)
         gluPerspective(45.0f, whRatio,0.1f,100.0f);
     } else {
         glOrtho(-width/200.0, width/200.0, -height/200.0, height/200.0, -100.0, 100.0);
-        //glOrtho(-3 ,3, -3, 3,-100,100);
     }
 
 
