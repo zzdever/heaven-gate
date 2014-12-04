@@ -2,24 +2,15 @@
 #define GLALL_H
 
 
+#include <vector>
+
 #include "globject.h"
 #include "gllight.h"
 #include "misc.h"
-#include "objfile.h"
 #include "nurbs.h"
 
 
-//==========================================
-// File path definition
-// You may need to change this to compile
-#define CRACK "/Users/ying/Crack.bmp"
-#define SPOT "/Users/ying/Spot.bmp"
-#define MONET "/Users/ying/Monet.bmp"
-#define NIGHTSKY "/Users/ying/starskyrecur.bmp"
-//==========================================
-
 #define BMP_Header_Length 54
-
 
 #define EYE_ROTATION_COEFFICIENT 0.05
 #define EYE_STEP_COEFFICIENT 0.07
@@ -27,6 +18,9 @@
 #define ZOOM_THRESHOLD 0.000001
 
 
+//void SetupObjectList(){
+
+//}
 
 class GlAll{
 public:
@@ -51,12 +45,16 @@ public:
     void mouse_move(int dx, int dy);
 
     void SelectObject(GLint x, GLint y);
-    void draw(GLenum model=GL_RENDER);
-    vector<GLdouble> screen2world(int x, int y);
+    void ProcessHits(GLint hits, GLuint buffer[]);
+    std::vector<GLdouble> screen2world(int x, int y);
 
-    bool select;
 
     void change_light(int num, float value[4], LightParam param = Diffuse);
+
+
+    Girl girl;
+
+
 
 private:
 
@@ -93,7 +91,9 @@ private:
     float updownAmount;
 
 
-    ObjFileSupport objfile;
+    vector<ObjectFramework*> objectList;
+    int selectedObject;
+
     Nurbs tableLamp;
 
 
@@ -112,7 +112,6 @@ private:
     void Draw_Leg();
 
     void Radio();
-
 
 };
 

@@ -31,6 +31,7 @@ void Window::setMainLayout(Window* parent)
     objectGroup->setTitle(tr("Object Control"));
 
 
+    /*
     // object names
     QGroupBox *objectNameGroup = new QGroupBox(objectGroup);
     objectNameGroup->setTitle(tr("Objects"));
@@ -41,6 +42,7 @@ void Window::setMainLayout(Window* parent)
 
     QHBoxLayout *objectNameGroupLayout = new QHBoxLayout(objectNameGroup);
     objectNameGroupLayout->addWidget(objectName);
+    */
 
 
 
@@ -52,42 +54,43 @@ void Window::setMainLayout(Window* parent)
     QComboBox *objectTexture = new QComboBox(objectPropertyGroup);
     // TODO add items
     objectTexture->addItem("crack");
-    //connect(objectTexture, SIGNAL(currentIndexChanged(int)), glWidgetMain, SLOT(SwitchObjectNum(int)));
+    connect(objectTexture, SIGNAL(currentIndexChanged(int)), glWidgetMain, SLOT(changeTexture(int)));
 
 
     QSlider *moveXSlider = new QSlider(Qt::Horizontal, objectPropertyGroup);
     moveXSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     moveXSlider->setRange(-100,100);
     moveXSlider->setValue(0);
+    moveXSlider->sliderReleased();
     // TODO slot should set back to 0
-    //connect(moveXSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(moveX(int)));
+    connect(moveXSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(moveX(int)));
 
 
     QSlider *moveYSlider = new QSlider(Qt::Horizontal, objectPropertyGroup);
     moveYSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     moveYSlider->setRange(-100,100);
     moveYSlider->setValue(0);
-    //connect(moveYSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(changeG(int)));
+    connect(moveYSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(moveY(int)));
 
     QSlider *moveZSlider = new QSlider(Qt::Horizontal, objectPropertyGroup);
     moveZSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     moveZSlider->setRange(-100,100);
     moveZSlider->setValue(0);
-    //connect(moveZSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(changeB(int)));
+    connect(moveZSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(moveZ(int)));
 
 
     QSlider *rotateSlider = new QSlider(Qt::Horizontal, objectPropertyGroup);
     rotateSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     rotateSlider->setRange(0,360);
     rotateSlider->setValue(0);
-    //connect(rotateSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(changeA(int)));
+    connect(rotateSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(rotate(int)));
 
 
     QSlider *scaleSlider = new QSlider(Qt::Horizontal, objectPropertyGroup);
     scaleSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     scaleSlider->setRange(0,500);
     scaleSlider->setValue(100);
-    //connect(scaleSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(changeA(int)));
+    connect(scaleSlider, SIGNAL(valueChanged(int)), glWidgetMain, SLOT(scale(int)));
 
 
     QGridLayout *objectPropertyGroupLayout = new QGridLayout(objectPropertyGroup);
@@ -110,7 +113,9 @@ void Window::setMainLayout(Window* parent)
     //object control layout
     QVBoxLayout *objectGroupLayout = new QVBoxLayout(objectGroup);
     objectGroupLayout->setMargin(3);
+    /*
     objectGroupLayout->addWidget(objectNameGroup);
+    */
     objectGroupLayout->addWidget(objectPropertyGroup);
 
 

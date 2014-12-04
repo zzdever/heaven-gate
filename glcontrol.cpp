@@ -4,67 +4,12 @@
 #include <QThread>
 
 
-void GlAll::draw(GLenum model)
-{
-    glMatrixMode(GL_MODELVIEW);
-    if(model==GL_SELECT){
-        glColor3f(1.0,0.0,0.0);
-        glLoadName(100);
-        glPushMatrix();
-        glTranslatef(-5, 0.0, 10.0);
-        glBegin(GL_QUADS);
-        glVertex3f(-1, -1, 0);
-        glVertex3f( 1, -1, 0);
-        glVertex3f( 1, 1, 0);
-        glVertex3f(-1, 1, 0);
-        glEnd();
-        glPopMatrix();
-
-        glColor3f(0.0,0.0,1.0);
-        glLoadName(101);
-        glPushMatrix();
-        glTranslatef(5, 0.0, -10.0);
-        glBegin(GL_QUADS);
-        glVertex3f(-1, -1, 0);
-        glVertex3f( 1, -1, 0);
-        glVertex3f( 1, 1, 0);
-        glVertex3f(-1, 1, 0);
-        glEnd();
-        glPopMatrix();
-        glPopName();
-    }
-    else{
-        glColor3f(1.0,0.0,0.0);
-        glPushMatrix();
-        glTranslatef(-5, 0.0, -5.0);
-        glBegin(GL_QUADS);
-        glVertex3f(-1, -1, 0);
-        glVertex3f( 1, -1, 0);
-        glVertex3f( 1, 1, 0);
-        glVertex3f(-1, 1, 0);
-        glEnd();
-        glPopMatrix();
-
-        glColor3f(0.0,0.0,1.0);
-        glPushMatrix();
-        glTranslatef(5, 0.0, -10.0);
-        glBegin(GL_QUADS);
-        glVertex3f(-1, -1, 0);
-        glVertex3f( 1, -1, 0);
-        glVertex3f( 1, 1, 0);
-        glVertex3f(-1, 1, 0);
-        glEnd();
-        glPopMatrix();
-    }
-}
-
-
-void processHits(GLint hits, GLuint buffer[])
+void GlAll::ProcessHits(GLint hits, GLuint buffer[])
 {
     unsigned int i, j;
     GLuint names, *ptr, minZ, *ptrNames, numberOfNames;
 
-    printf ("hits = %d\n", hits);
+    DEBUG("hits = "<<hits);
 
     ptr = (GLuint *) buffer;
     minZ = 0xffffffff;
@@ -79,14 +24,13 @@ void processHits(GLint hits, GLuint buffer[])
         ptr += names+2;
     }
 
-    printf ("The closest hit names are ");
+    DEBUG("The closest hit names are ");
     ptr = ptrNames;
 
     for (j = 0; j < numberOfNames; j++, ptr++) {
-         printf ("%d ", *ptr);
+         DEBUG(*ptr);
      }
-     printf ("\n");
- }
+}
 
 
 vector<GLdouble> GlAll::screen2world(int x, int y)
@@ -118,10 +62,8 @@ vector<GLdouble> GlAll::screen2world(int x, int y)
 
 void GlAll::SelectObject(GLint x, GLint y)
 {
-
     GLuint selectBuff[32]={0};//创建一个保存选择结果的数组
     GLint hits, viewport[4];
-
 
     glGetIntegerv(GL_VIEWPORT, viewport); //获得viewport
     glSelectBuffer(32, selectBuff); //告诉OpenGL初始化  selectbuffer
@@ -130,34 +72,32 @@ void GlAll::SelectObject(GLint x, GLint y)
     glInitNames();  //初始化名字栈
     glPushName(0);  //在名字栈中放入一个初始化名字，这里为‘0’
 
-
     glMatrixMode(GL_PROJECTION);    //进入投影阶段准备拾取
     glPushMatrix();     //保存以前的投影矩阵
     glLoadIdentity();   //载入单位矩阵
 
-
     gluPickMatrix(viewport[2]/2,           // 设定我们选择框的大小，建立拾取矩阵，就是上面的公式
                   viewport[3]/2,    // viewport[3]保存的是窗口的高度，窗口坐标转换为OpenGL坐标
-                  0.,0.,              // 选择框的大小为2，2
+                  5,5,              // 选择框的大小为5，5
                   viewport          // 视口信息，包括视口的起始位置和大小
                   );
 
-    std::cout<<" "<<viewport[2]<<" "<<viewport[3]<<std::endl;
 
+    float whRatio = (GLfloat)wWidth/(GLfloat)wHeight;
+    gluPerspective(45.0f, whRatio,0.1f,100.0f);
 
     redraw(GL_SELECT);
-
 
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();  // 返回正常的投影变换
 
     hits = glRenderMode(GL_RENDER); // 从选择模式返回正常模式,该函数返回选择到对象的个数
-    std::cout<<hits<<"ssssssssssssssssssssssssss selected"<<std::endl;
-    if(hits > 0)
-        processHits(hits, selectBuff);  //  选择结果处理
+
+    if(hits > 0){
+        ProcessHits(hits, selectBuff);  //  选择结果处理
+    }
 
 }
-
 
 
 
@@ -590,7 +530,7 @@ void GlAll::glAllInit()
     sideAmount = 0;
     updownAmount = 0;
 
-    select = false;
+    selectedObject = -1;
 
 
     glEnable(GL_DEPTH_TEST);
@@ -614,8 +554,6 @@ void GlAll::glAllInit()
 
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 
-    objfile.ReadFile("/Users/ying/Documents/DEV/qt_prj/gl/girl.obj");
-
     tableLamp.SetupRC();
 
     return;
@@ -635,7 +573,6 @@ void GlAll::updateView(int width, int height)
         gluPerspective(45.0f, whRatio,0.1f,100.0f);
     } else {
         glOrtho(-width/200.0, width/200.0, -height/200.0, height/200.0, -100.0, 100.0);
-        //glOrtho(-3 ,3, -3, 3,-100,100);
     }
 
 

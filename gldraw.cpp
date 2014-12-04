@@ -3,9 +3,6 @@
 
 
 
-
-
-
 void setMatirial(const GLfloat mat_diffuse[4], GLfloat mat_shininess)
 {
     static const GLfloat mat_specular[] = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -23,134 +20,21 @@ void setMatirial(const GLfloat mat_diffuse[4], GLfloat mat_shininess)
 }
 
 
-void ModelCube(){
-    glutSolidCube(1.0);
-}
+//void drawprism(){
+//    ModelPrism(12);
+//}
 
-void ModelSphere(){
-    glutSolidSphere(0.5, 60, 60);
-}
-
-void ModelCylinder(){
-    const int grain = 60;
-    glPushMatrix();
-    glRotatef(-90,1,0,0);
-    glTranslatef(0,0,-0.5);
-    gluCylinder(gluNewQuadric(), 0.5, 0.5, 1.0, grain, grain);
-
-    // top
-    glBegin(GL_POLYGON);
-    for(int i=0; i<grain; i++){
-        glVertex3f(0.5*cos(PI*2/grain*i), 0.5*sin(PI*2/grain*i), 1.0);
-    }
-    glEnd();
-
-    // bottom
-    glBegin(GL_POLYGON);
-    for(int i=0; i<grain; i++){
-        glVertex3f(0.5*cos(PI*2/grain*i), 0.5*sin(PI*2/grain*i), 0.);
-    }
-    glEnd();
-
-    glPopMatrix();
-}
-
-void ModelCone(){
-    const int grain = 60;
-    glPushMatrix();
-    glRotatef(-90,1,0,0);
-    glTranslatef(0,0,-0.5);
-    glutSolidCone(0.5, 1.0, grain, grain);
-
-    // bottom
-    glBegin(GL_POLYGON);
-    for(int i=0; i<grain; i++){
-        glVertex3f(0.5*cos(PI*2/grain*i), 0.5*sin(PI*2/grain*i), 0.);
-    }
-    glEnd();
-
-    glPopMatrix();
-}
-
-
-void ModelPrism(int num){
-    glPushMatrix();
-
-    for(int i=0; i<num; i++){
-        glBegin(GL_POLYGON);
-        glVertex3f(0.5*cos(PI*2/num*i), 0.5, 0.5*sin(PI*2/num*i));
-        glVertex3f(0.5*cos(PI*2/num*i), -0.5, 0.5*sin(PI*2/num*i));
-        glVertex3f(0.5*cos(PI*2/num*(i+1)), -0.5, 0.5*sin(PI*2/num*(i+1)));
-        glVertex3f(0.5*cos(PI*2/num*(i+1)), 0.5, 0.5*sin(PI*2/num*(i+1)));
-        glEnd();
-    }
-
-    // top
-    glBegin(GL_POLYGON);
-    for(int i=0; i<num; i++){
-        glVertex3f(0.5*cos(PI*2/num*i), 0.5, 0.5*sin(PI*2/num*i));
-    }
-    glEnd();
-
-    // bottom
-    glBegin(GL_POLYGON);
-    for(int i=0; i<num; i++){
-        glVertex3f(0.5*cos(PI*2/num*i), -0.5, 0.5*sin(PI*2/num*i));
-    }
-    glEnd();
-
-    glPopMatrix();
-}
-
-
-void ModelFrustum(int num, float ratio){
-    glPushMatrix();
-    if(ratio>1.0) ratio = 1.0;
-
-    // sides
-    for(int i=0; i<num; i++){
-        glBegin(GL_POLYGON);
-        glVertex3f(ratio*0.5*cos(PI*2/num*i), 0.5, ratio*0.5*sin(PI*2/num*i));
-        glVertex3f(0.5*cos(PI*2/num*i), -0.5, 0.5*sin(PI*2/num*i));
-        glVertex3f(0.5*cos(PI*2/num*(i+1)), -0.5, 0.5*sin(PI*2/num*(i+1)));
-        glVertex3f(ratio*0.5*cos(PI*2/num*(i+1)), 0.5, ratio*0.5*sin(PI*2/num*(i+1)));
-        glEnd();
-    }
-
-    // top
-    glBegin(GL_POLYGON);
-    for(int i=0; i<num; i++){
-        glVertex3f(ratio*0.5*cos(PI*2/num*i), 0.5, ratio*0.5*sin(PI*2/num*i));
-    }
-    glEnd();
-
-    // bottom
-    glBegin(GL_POLYGON);
-    for(int i=0; i<num; i++){
-        glVertex3f(0.5*cos(PI*2/num*i), -0.5, 0.5*sin(PI*2/num*i));
-    }
-    glEnd();
-
-    glPopMatrix();
-}
-
-
-
-void drawprism(){
-    ModelPrism(12);
-}
-
-void DrawStage(){
-    float radius = 5.0;
-    for(int i=0; i<6; i++){
-        glPushMatrix();
-        glScalef(radius,0.3,radius);
-        glTranslatef(0., i*0.3, 0.);
-        ModelFrustum(8, 0.9);
-        glPopMatrix();
-        radius *= 0.8;
-    }
-}
+//void DrawStage(){
+//    float radius = 5.0;
+//    for(int i=0; i<6; i++){
+//        glPushMatrix();
+//        glScalef(radius,0.3,radius);
+//        glTranslatef(0., i*0.3, 0.);
+//        ModelFrustum(8, 0.9);
+//        glPopMatrix();
+//        radius *= 0.8;
+//    }
+//}
 
 
 
@@ -165,7 +49,6 @@ void GlAll::redraw(GLenum mode)
 
     MoveControl();
     MoveEye();
-    updateView(wWidth, wHeight);
 
 
     if (bWire) {
@@ -195,26 +78,26 @@ void GlAll::redraw(GLenum mode)
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
 
-    if(mode==GL_SELECT)
-        glLoadName(100);
-    ObjectFramework cube(1,1,1);
-    cube.SetPosition(0,0,2);
-    cube.SetScale(0.5);
-    cube.SetTexture(texCrack);
-    cube.Draw(ModelCube);
+//    if(mode==GL_SELECT)
+//        glLoadName(100);
+//    ObjectFramework cube(1,1,1);
+//    cube.SetPosition(0,0,2);
+//    cube.SetScale(0.5);
+//    cube.SetTexture(texCrack);
+//    cube.Draw(ModelCube);
 
-    if(mode==GL_SELECT)
-        glLoadName(101);
-    ObjectFramework cylinder(1,1,1);
-    cylinder.SetPosition(-2,0,2);
-    cylinder.Draw(ModelCylinder);
+//    if(mode==GL_SELECT)
+//        glLoadName(101);
+//    ObjectFramework cylinder(1,1,1);
+//    cylinder.SetPosition(-2,0,2);
+//    cylinder.Draw(ModelCylinder);
 
-    if(mode==GL_SELECT)
-        glLoadName(102);
-    ObjectFramework cone(1,1,1);
-    cone.SetPosition(2,0,2);
-    cone.SetScale(1.5);
-    cone.Draw(ModelCone);
+//    if(mode==GL_SELECT)
+//        glLoadName(102);
+//    ObjectFramework cone(1,1,1);
+//    cone.SetPosition(2,0,2);
+//    cone.SetScale(1.5);
+//    cone.Draw(ModelCone);
 
 //    if(mode==GL_SELECT)
 //        glLoadName(103);
@@ -230,14 +113,9 @@ void GlAll::redraw(GLenum mode)
 //    stage.SetScale(1);
 //    stage.Draw(DrawStage);
 
-    if(mode==GL_SELECT)
-        glLoadName(105);
-    ObjectFramework goddess(3,0.5,3);
-    goddess.SetPosition(0,3,0);
-    goddess.SetScale(1);
-    goddess.SetDrawEnv();
-    objfile.DrawModel();
-    goddess.UnsetDrawEnv();
+    //girl.SetPosition(0,0,5);
+    //girl.SetScale(1);
+    girl.Draw();
 
 
     glPopAttrib();
