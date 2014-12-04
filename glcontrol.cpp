@@ -20,7 +20,7 @@ void GlAll::draw(GLenum model)
         glPopMatrix();
 
         glColor3f(0.0,0.0,1.0);
-        glLoadName(101);
+        xglLoadName(101);
         glPushMatrix();
         glTranslatef(5, 0.0, -10.0);
         glBegin(GL_QUADS);
@@ -29,8 +29,8 @@ void GlAll::draw(GLenum model)
         glVertex3f( 1, 1, 0);
         glVertex3f(-1, 1, 0);
         glEnd();
-
         glPopMatrix();
+        glPopName();
     }
     else{
         glColor3f(1.0,0.0,0.0);
@@ -62,7 +62,6 @@ void GlAll::draw(GLenum model)
 void GlAll::SelectObject(GLint x, GLint y)
 
 {
-    x=0;y=0;
 
     GLuint selectBuff[32]={0};//创建一个保存选择结果的数组
     GLint hits, viewport[4];
