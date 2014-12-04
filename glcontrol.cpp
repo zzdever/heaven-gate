@@ -6,6 +6,7 @@
 
 void GlAll::draw(GLenum model)
 {
+    glMatrixMode(GL_MODELVIEW);
     if(model==GL_SELECT){
         glColor3f(1.0,0.0,0.0);
         glLoadName(100);
@@ -20,7 +21,7 @@ void GlAll::draw(GLenum model)
         glPopMatrix();
 
         glColor3f(0.0,0.0,1.0);
-        xglLoadName(101);
+        glLoadName(101);
         glPushMatrix();
         glTranslatef(5, 0.0, -10.0);
         glBegin(GL_QUADS);
@@ -58,9 +59,64 @@ void GlAll::draw(GLenum model)
 }
 
 
+void processHits(GLint hits, GLuint buffer[])
+{
+    unsigned int i, j;
+    GLuint names, *ptr, minZ, *ptrNames, numberOfNames;
+
+    printf ("hits = %d\n", hits);
+
+    ptr = (GLuint *) buffer;
+    minZ = 0xffffffff;
+    for (i = 0; i < hits; i++) {
+        names = *ptr;
+        ptr++;
+        if (*ptr < minZ) {
+            numberOfNames = names;
+            minZ = *ptr;
+            ptrNames = ptr+2;
+        }
+        ptr += names+2;
+    }
+
+    printf ("The closest hit names are ");
+    ptr = ptrNames;
+
+    for (j = 0; j < numberOfNames; j++, ptr++) {
+         printf ("%d ", *ptr);
+     }
+     printf ("\n");
+ }
+
+
+vector<GLdouble> GlAll::screen2world(int x, int y)
+{
+    GLint viewport[4];
+    GLdouble modelview[16];
+    GLdouble projection[16];
+    GLfloat winX, winY, winZ;
+    GLdouble posX, posY, posZ;
+
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+    glGetDoublev(GL_PROJECTION_MATRIX, projection);
+    glGetIntegerv(GL_VIEWPORT, viewport);
+
+    winX = (float)x;
+    winY = (float)viewport[3] - (float)y;
+
+    glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
+    gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+
+    vector<GLdouble> v;
+    v.push_back(posX);
+    v.push_back(posY);
+    v.push_back(posZ);
+
+    //GVector v(4, posX, posY, posZ, 1.0);
+    return v;
+}
 
 void GlAll::SelectObject(GLint x, GLint y)
-
 {
 
     GLuint selectBuff[32]={0};//创建一个保存选择结果的数组
@@ -68,7 +124,7 @@ void GlAll::SelectObject(GLint x, GLint y)
 
 
     glGetIntegerv(GL_VIEWPORT, viewport); //获得viewport
-    glSelectBuffer(64, selectBuff); //告诉OpenGL初始化  selectbuffer
+    glSelectBuffer(32, selectBuff); //告诉OpenGL初始化  selectbuffer
     glRenderMode(GL_SELECT);    //进入选择模式
 
     glInitNames();  //初始化名字栈
@@ -80,33 +136,25 @@ void GlAll::SelectObject(GLint x, GLint y)
     glLoadIdentity();   //载入单位矩阵
 
 
-    float m[16];
-    glGetFloatv(GL_PROJECTION_MATRIX, m);
-
-    gluPickMatrix( x,           // 设定我们选择框的大小，建立拾取矩阵，就是上面的公式
-                  viewport[3]-y,    // viewport[3]保存的是窗口的高度，窗口坐标转换为OpenGL坐标
-                  2,2,              // 选择框的大小为2，2
+    gluPickMatrix(viewport[2]/2,           // 设定我们选择框的大小，建立拾取矩阵，就是上面的公式
+                  viewport[3]/2,    // viewport[3]保存的是窗口的高度，窗口坐标转换为OpenGL坐标
+                  0.,0.,              // 选择框的大小为2，2
                   viewport          // 视口信息，包括视口的起始位置和大小
                   );
 
-
-    glGetFloatv(GL_PROJECTION_MATRIX, m);
-    glOrtho(-10, 10, -10, 10, -10, 10);     //拾取矩阵乘以投影矩阵，这样就可以让选择框放大为和视体一样大
-    glGetFloatv(GL_PROJECTION_MATRIX, m);
+    std::cout<<" "<<viewport[2]<<" "<<viewport[3]<<std::endl;
 
 
-    draw(GL_SELECT);    // 该函数中渲染物体，并且给物体设定名字
+    redraw(GL_SELECT);
 
 
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();  // 返回正常的投影变换
-    glGetFloatv(GL_PROJECTION_MATRIX, m);
 
     hits = glRenderMode(GL_RENDER); // 从选择模式返回正常模式,该函数返回选择到对象的个数
+    std::cout<<hits<<"ssssssssssssssssssssssssss selected"<<std::endl;
     if(hits > 0)
-        std::cout<<hits<<"ssssssssssssssssssssssssss selected"<<std::endl;
-
-        //processSelect(selectBuff);  //  选择结果处理
+        processHits(hits, selectBuff);  //  选择结果处理
 
 }
 
@@ -542,6 +590,8 @@ void GlAll::glAllInit()
     sideAmount = 0;
     updownAmount = 0;
 
+    select = false;
+
 
     glEnable(GL_DEPTH_TEST);
 //    glEnable(GL_CULL_FACE);
@@ -574,6 +624,7 @@ void GlAll::glAllInit()
 void GlAll::updateView(int width, int height)
 {
     glViewport(0,0,width,height);						// Reset The Current Viewport
+
 
     glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
     glLoadIdentity();									// Reset The Projection Matrix

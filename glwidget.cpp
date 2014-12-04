@@ -240,6 +240,8 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
     if(isGLWidgetFocued == true){
         glAll.SelectObject(this->width()/2, this->height()/2);
+        resizeGL(this->width(), this->height());
+        //glAll.select = true;
     }
 
     DEBUG("gl widget focus got");

@@ -41,7 +41,7 @@ public:
 public:
     void init();
     void idle();
-    void redraw();
+    void redraw(GLenum mode=GL_RENDER);
     void reshape(int width, int height);
     void updateView(int width, int height);
     void glAllInit();
@@ -52,7 +52,9 @@ public:
 
     void SelectObject(GLint x, GLint y);
     void draw(GLenum model=GL_RENDER);
+    vector<GLdouble> screen2world(int x, int y);
 
+    bool select;
 
     void change_light(int num, float value[4], LightParam param = Diffuse);
 

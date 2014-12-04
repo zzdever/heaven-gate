@@ -156,18 +156,17 @@ void DrawStage(){
 
 
 
-void GlAll::redraw()
+void GlAll::redraw(GLenum mode)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();									// Reset The Current Modelview Matrix
 
     MoveControl();
     MoveEye();
+    updateView(wWidth, wHeight);
 
-
-    draw();
-
-    return;
 
     if (bWire) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -182,44 +181,57 @@ void GlAll::redraw()
     glEnable(GL_LIGHTING);
     glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
 
-    DrawCrosshair();
+    if(mode == GL_RENDER){
+        DrawCrosshair();
+        // lights
+        for(int i=0;i<LIGHT_COUNT;i++){
+            lights[i].DrawLight();
+        }
 
-    // lights
-    for(int i=0;i<LIGHT_COUNT;i++){
-        lights[i].DrawLight();
     }
+
 
 
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
 
+    if(mode==GL_SELECT)
+        glLoadName(100);
     ObjectFramework cube(1,1,1);
     cube.SetPosition(0,0,2);
     cube.SetScale(0.5);
     cube.SetTexture(texCrack);
     cube.Draw(ModelCube);
 
-
+    if(mode==GL_SELECT)
+        glLoadName(101);
     ObjectFramework cylinder(1,1,1);
     cylinder.SetPosition(-2,0,2);
     cylinder.Draw(ModelCylinder);
 
+    if(mode==GL_SELECT)
+        glLoadName(102);
     ObjectFramework cone(1,1,1);
     cone.SetPosition(2,0,2);
     cone.SetScale(1.5);
     cone.Draw(ModelCone);
 
-    ObjectFramework prism(1,3,1);
-    prism.SetPosition(0,2,2);
-    prism.SetScale(1);
-    prism.Draw(drawprism);
+//    if(mode==GL_SELECT)
+//        glLoadName(103);
+//    ObjectFramework prism(1,3,1);
+//    prism.SetPosition(0,2,2);
+//    prism.SetScale(1);
+//    prism.Draw(drawprism);
 
+//    if(mode==GL_SELECT)
+//        glLoadName(104);
+//    ObjectFramework stage(3,0.5,3);
+//    stage.SetPosition(0,0,0);
+//    stage.SetScale(1);
+//    stage.Draw(DrawStage);
 
-    ObjectFramework stage(3,0.5,3);
-    stage.SetPosition(0,0,0);
-    stage.SetScale(1);
-    stage.Draw(DrawStage);
-
+    if(mode==GL_SELECT)
+        glLoadName(105);
     ObjectFramework goddess(3,0.5,3);
     goddess.SetPosition(0,3,0);
     goddess.SetScale(1);
@@ -236,31 +248,34 @@ void GlAll::redraw()
     glRotatef(fRotate, 0, 1.0f, 0);			// Rotate around Y axis
     glRotatef(-90, 1, 0, 0);
     glScalef(0.2, 0.2, 0.2);
+//    //Draw_Triangle();						// Draw triangle
 
 
     glPushAttrib(GL_ALL_ATTRIB_BITS);   // save all attributes
-    //Draw_Triangle();						// Draw triangle
 
-
-
-    //DrawCone(0,0,0);
-    //glLoadIdentity();
-    //glutSolidSphere(0.9, 300, 300);
-
-    glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CW);
-    glBindTexture(GL_TEXTURE_2D, texNightSky); // 设置纹理
-    GLUquadricObj *quadricObj;
-    quadricObj = gluNewQuadric(); // 绘制球体
-    gluQuadricNormals(quadricObj, GL_SMOOTH); // 产生光滑
-    gluQuadricTexture(quadricObj, GL_TRUE); // 激活曲面纹理坐标参照
-    gluSphere(quadricObj, 100.0f, 32, 16); // 绘制球体
-
-
+    if(mode == GL_RENDER){
+        glEnable(GL_CULL_FACE);
+        glFrontFace(GL_CW);
+        glBindTexture(GL_TEXTURE_2D, texNightSky); // 设置纹理
+        GLUquadricObj *quadricObj;
+        quadricObj = gluNewQuadric(); // 绘制球体
+        gluQuadricNormals(quadricObj, GL_SMOOTH); // 产生光滑
+        gluQuadricTexture(quadricObj, GL_TRUE); // 激活曲面纹理坐标参照
+        gluSphere(quadricObj, 100.0f, 32, 16); // 绘制球体
+    }
 
     glPopAttrib();  // restore all attributes
 
     if (bAnim) fRotate    += 0.5f;
+
+//    if(select){
+//        vector<GLdouble> v = screen2world(wWidth/2, wHeight/2);
+//        for(int i=0;i<v.size();i++){
+//            std::cout<<v.at(i)<<" ";
+//        }
+//        std::cout<<std::endl;
+//        select = false;
+//    }
 
 
     // NOTE QOpenGLContext::swapBuffers() called with non-exposed window, behavior is undefined
