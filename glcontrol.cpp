@@ -20,7 +20,7 @@ void GlAll::draw(GLenum model)
         glPopMatrix();
 
         glColor3f(0.0,0.0,1.0);
-        xglLoadName(101);
+        glLoadName(101);
         glPushMatrix();
         glTranslatef(5, 0.0, -10.0);
         glBegin(GL_QUADS);
