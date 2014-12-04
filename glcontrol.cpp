@@ -6,14 +6,13 @@
 
 void GlAll::ProcessHits(GLint hits, GLuint buffer[])
 {
-    unsigned int i, j;
     GLuint names, *ptr, minZ, *ptrNames, numberOfNames;
 
     DEBUG("hits = "<<hits);
 
     ptr = (GLuint *) buffer;
     minZ = 0xffffffff;
-    for (i = 0; i < hits; i++) {
+    for (int i = 0; i < (int)hits; i++) {
         names = *ptr;
         ptr++;
         if (*ptr < minZ) {
@@ -27,10 +26,10 @@ void GlAll::ProcessHits(GLint hits, GLuint buffer[])
     DEBUG("The closest hit names are ");
     ptr = ptrNames;
 
-    for (j = 0; j < numberOfNames; j++, ptr++) {
+    for (int j = 0; j < (int)numberOfNames; j++, ptr++) {
          DEBUG(*ptr);
-         for(int k=0; k<objectList.size(); k++){
-             if(objectList.at(k)->GetObjectFrameworkID() == *ptr){
+         for(int k=0; k<(int)objectList.size(); k++){
+             if(objectList.at(k)->GetObjectFrameworkID() == (int)*ptr){
                  objectList.at(k)->Select();
                  selectedObject = objectList.at(k);
              }
@@ -40,33 +39,6 @@ void GlAll::ProcessHits(GLint hits, GLuint buffer[])
      }
 }
 
-
-vector<GLdouble> GlAll::screen2world(int x, int y)
-{
-    GLint viewport[4];
-    GLdouble modelview[16];
-    GLdouble projection[16];
-    GLfloat winX, winY, winZ;
-    GLdouble posX, posY, posZ;
-
-    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
-    glGetDoublev(GL_PROJECTION_MATRIX, projection);
-    glGetIntegerv(GL_VIEWPORT, viewport);
-
-    winX = (float)x;
-    winY = (float)viewport[3] - (float)y;
-
-    glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
-    gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
-
-    vector<GLdouble> v;
-    v.push_back(posX);
-    v.push_back(posY);
-    v.push_back(posZ);
-
-    //GVector v(4, posX, posY, posZ, 1.0);
-    return v;
-}
 
 void GlAll::SelectObject(GLint x, GLint y)
 {
@@ -84,8 +56,10 @@ void GlAll::SelectObject(GLint x, GLint y)
     glPushMatrix();     //保存以前的投影矩阵
     glLoadIdentity();   //载入单位矩阵
 
-    gluPickMatrix(viewport[2]/2,           // 设定我们选择框的大小，建立拾取矩阵，就是上面的公式
-                  viewport[3]/2,    // viewport[3]保存的是窗口的高度，窗口坐标转换为OpenGL坐标
+    x = viewport[2]/2;
+    y = viewport[3]/2;
+    gluPickMatrix(x,                // 设定我们选择框的大小，建立拾取矩阵，就是上面的公式
+                  y,                // viewport[3]保存的是窗口的高度，窗口坐标转换为OpenGL坐标
                   5,5,              // 选择框的大小为5，5
                   viewport          // 视口信息，包括视口的起始位置和大小
                   );
@@ -105,7 +79,7 @@ void GlAll::SelectObject(GLint x, GLint y)
         ProcessHits(hits, selectBuff);  //  选择结果处理
     }
     else{
-        for(int k=0; k<objectList.size(); k++){
+        for(int k=0; k<(int)objectList.size(); k++){
             objectList.at(k)->Unselect();
         }
         selectedObject = NULL;
@@ -408,14 +382,36 @@ void GlAll::key(unsigned char k)
     }
     // zoom to fit
     case '0':{
+        if(selectedObject == NULL)
+            break;
+
+        Point3f objp = selectedObject->GetPosition();
+        Dimension3f objd = selectedObject->GetDimension();
+        updownAmount = objp.y - eye[1];
+        // (1-0.8) because of smooth move
+        zoomAmount = (1-0.8)*(sqrt(pow(objp.x-eye[0],2) + pow(objp.z-eye[2],2))
+                - 2*(wHeight<wWidth ? objd.height : (objd.length<objd.width ? objd.length : objd.width))*cos(45.0/2/180*PI) );
+
         break;
     }
     // pan
     case 'P':{
+        if(isCameraOrbit)
+            break;
+        isCameraPan = !isCameraPan;
         break;
     }
     // orbit
     case 'O':{
+        if(selectedObject == NULL || isCameraPan){
+            isCameraOrbit = false;
+            break;
+        }
+        isCameraOrbit = !isCameraOrbit;
+        if(isCameraOrbit){
+            Point3f objp = selectedObject->GetPosition();
+            orbitRadius = sqrt(pow(objp.x-eye[0],2) + pow(objp.z-eye[2],2));
+        }
         break;
     }
     }
@@ -453,6 +449,21 @@ void GlAll::mouse_move(int dx, int dy){
 
 void GlAll::MoveControl()
 {
+    if(isCameraPan){
+        eye_theta[0] += 2.0;
+    }
+
+    if(isCameraOrbit && selectedObject!=NULL){
+        Point3f objp = selectedObject->GetPosition();
+        eye[0] = objp.x - orbitRadius*sin(eye_theta[0]*EYE_ROTATION_COEFFICIENT/180*PI);
+        eye[2] = objp.z + orbitRadius*cos(eye_theta[0]*EYE_ROTATION_COEFFICIENT/180*PI);
+        eye_theta[0] += 10.0;
+    }
+    else{
+        isCameraOrbit = false;
+    }
+
+
     if(zoomAmount > ZOOM_THRESHOLD || zoomAmount < -ZOOM_THRESHOLD){
         zoomAmount = zoomAmount*0.8;
         eye[0] += zoomAmount*(eye_center[0] - eye[0]);
@@ -481,9 +492,6 @@ void GlAll::MoveControl()
         }
         QThread::msleep(10);
     }
-
-
-
 
 }
 
@@ -579,6 +587,8 @@ void GlAll::glAllInit()
     zoomAmount = 0.;
     sideAmount = 0;
     updownAmount = 0;
+    isCameraPan = false;
+    isCameraOrbit = false;
 
     selectedObject = NULL;
 
@@ -648,5 +658,33 @@ void GlAll::reshape(int width, int height)
 void GlAll::idle()
 {
     glutPostRedisplay();
+}
+
+
+vector<GLdouble> GlAll::screen2world(int x, int y)
+{
+    GLint viewport[4];
+    GLdouble modelview[16];
+    GLdouble projection[16];
+    GLfloat winX, winY, winZ;
+    GLdouble posX, posY, posZ;
+
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+    glGetDoublev(GL_PROJECTION_MATRIX, projection);
+    glGetIntegerv(GL_VIEWPORT, viewport);
+
+    winX = (float)x;
+    winY = (float)viewport[3] - (float)y;
+
+    glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
+    gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+
+    vector<GLdouble> v;
+    v.push_back(posX);
+    v.push_back(posY);
+    v.push_back(posZ);
+
+    //GVector v(4, posX, posY, posZ, 1.0);
+    return v;
 }
 

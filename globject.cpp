@@ -80,9 +80,9 @@ Point3f ObjectFramework::GetPosition() const
 
 void ObjectFramework::SetRotation(int drx, int dry, int drz)
 {
-    drx == 0 ? : rotation_x += drx;
-    dry == 0 ? : rotation_y += dry;
-    drz == 0 ? : rotation_z += drz;
+    rotation_x += drx;
+    rotation_y += dry;
+    rotation_z += drz;
 }
 
 void ObjectFramework::SetDrawEnv(GLenum drawMode)

@@ -64,7 +64,7 @@ public:
         selectedObject->SetScale(s/100.0);
     }
     void change_texture(int value){
-        ;
+        value;
     }
 
 private:
@@ -101,6 +101,9 @@ private:
     float zoomAmount;
     float sideAmount;
     float updownAmount;
+    bool isCameraPan;
+    bool isCameraOrbit;
+    float orbitRadius;
 
 
     vector<ObjectFramework*> objectList;

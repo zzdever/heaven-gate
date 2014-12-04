@@ -27,7 +27,7 @@ public:
     void SetDimension(GLfloat p_length, GLfloat p_width, GLfloat p_height);
     Dimension3f GetDimension() const;
     void SetEnvelopingDimension(GLfloat p_length, GLfloat p_width, GLfloat p_height);
-    Dimension3f GetEnvelopingDimension() { }
+    //Dimension3f GetEnvelopingDimension() { }
 
     void SetScale(GLfloat coefficient){ scaleCoefficient = coefficient; }
     GLfloat GetScale(){ return scaleCoefficient; }
