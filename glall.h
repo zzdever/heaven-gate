@@ -112,8 +112,6 @@ private:
     vector<ObjectFramework*> objectList;
     ObjectFramework* selectedObject;
 
-    Nurbs tableLamp;
-
 
     GLuint load_texture(const char* file_name);
     void TextureColorkey(GLubyte r, GLubyte g, GLubyte b, GLubyte threshold);

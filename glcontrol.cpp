@@ -582,7 +582,7 @@ void GlAll::glAllInit()
 
     eye[0] = 0;
     eye[1] = 0;
-    eye[2] = 8;
+    eye[2] = 15;
 
     eye_center[0] = 0;
     eye_center[1] = 0;
@@ -622,10 +622,7 @@ void GlAll::glAllInit()
 
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 
-
-
     SetupScene();
-    tableLamp.SetupRC();
 
     return;
 }

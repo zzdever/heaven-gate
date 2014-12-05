@@ -20,7 +20,8 @@ HEADERS  += \
     gllight.h \
     glall.h \
     objfile.h \
-    nurbs.h
+    nurbs.h \
+    collision.h
 
 SOURCES += main.cpp\
     window.cpp \
@@ -31,7 +32,8 @@ SOURCES += main.cpp\
     gllight.cpp \
     objfile.cpp \
     nurbs.cpp \
-    misc.cpp
+    misc.cpp \
+    collision.cpp
 
 FORMS    += mainwindow.ui
 

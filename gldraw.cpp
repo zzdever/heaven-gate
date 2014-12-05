@@ -50,6 +50,7 @@ void GlAll::redraw(GLenum drawMode)
     MoveControl();
     MoveEye();
 
+
     if (bWire) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
     else { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
 
@@ -127,6 +128,39 @@ void GlAll::SetupScene()
         poll->SetObjectFrameworkName("poll");
         objectList.push_back(poll);
     }
+
+    // heaven gate
+    {
+        int heavenGateZ = 10;
+        ModelCube* doorFrame[3];
+        for(int i=0;i<3;i++){
+            doorFrame[i] = new ModelCube;
+            doorFrame[i]->SetObjectFrameworkName("doorframe");
+            doorFrame[i]->SetTexture(texBalcony);
+            doorFrame[i]->SetScale(3);
+            objectList.push_back(doorFrame[i]);
+        }
+
+        doorFrame[0]->SetDimension(1.0,0.1,0.1);
+        doorFrame[0]->SetPosition(0,0.45,heavenGateZ);
+        doorFrame[1]->SetDimension(0.1,0.1,1.0);
+        doorFrame[1]->SetPosition(-0.45,0,heavenGateZ);
+        doorFrame[2]->SetDimension(0.1,0.1,1.0);
+        doorFrame[2]->SetPosition(0.45,0,heavenGateZ);
+
+//        HeavenGate* heavenGate = new HeavenGate;
+//        heavenGate->SetPosition(0,0,10);
+//        heavenGate->SetEnvelopingDimension(0,0,0);
+//        heavenGate->SetObjectFrameworkName("heavengate");
+//        objectList.push_back(heavenGate);
+    }
+
+    Tablelamp* tablelamp = new Tablelamp;
+    tablelamp->SetPosition(0,0,-5);
+    tablelamp->SetScale(2);
+    tablelamp->SetObjectFrameworkName("tablelamp");
+    objectList.push_back(tablelamp);
+
 }
 
 

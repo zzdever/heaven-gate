@@ -48,6 +48,9 @@ GLint Nurbs::GenDrawList()
 
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
+    //glDisable(GL_LIGHTING);
+
+
     //glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glScalef(0.05, 0.05, 0.05);

@@ -6,6 +6,7 @@
 #include <GLUT/glut.h>
 
 #include "objfile.h"
+#include "nurbs.h"
 
 #include "misc.h"
 
@@ -46,6 +47,7 @@ public:
 
     void Select(){ isSelected = true; }
     void Unselect(){ isSelected = false; }
+    bool IsSelected(){ return isSelected; }
 
     //bool isInFramework(Point3f point);
 
@@ -410,6 +412,48 @@ public:
 private:
     float wiggle[4][4][4][3];
 };
+
+
+class HeavenGate:public ObjectFramework
+{
+public:
+    HeavenGate(){}
+    ~HeavenGate(){}
+
+    void Draw(GLenum drawMode = GL_RENDER){
+        SetDrawEnv(drawMode);
+
+        UnsetDrawEnv();
+
+        theta += 0.5;
+        if(theta >= 360)
+            theta = 0;
+
+    }
+private:
+    float theta;
+};
+
+
+class Tablelamp:public ObjectFramework
+{
+public:
+    Tablelamp(){ tablelamp.SetupRC(); }
+    ~Tablelamp(){}
+
+    void Draw(GLenum drawMode = GL_RENDER){
+        SetDrawEnv(drawMode);
+        glPushMatrix();
+        glTranslatef(-0.2,-0.4,0);
+        glRotatef(-90,1,0,0);
+        tablelamp.DrawTableLamp();
+        glPopMatrix();
+        UnsetDrawEnv();
+    }
+private:
+    Nurbs tablelamp;
+};
+
 
 
 
