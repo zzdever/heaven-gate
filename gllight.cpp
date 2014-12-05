@@ -55,9 +55,6 @@ void GlLight::DrawLight()
 
     glPushMatrix();
 
-
-
-
     glTranslatef(position[0], position[1], position[2]);
 
     glPushAttrib(GL_ALL_ATTRIB_BITS);
@@ -65,7 +62,9 @@ void GlLight::DrawLight()
     glMaterialfv(GL_FRONT, GL_AMBIENT, color);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
     glMaterialfv(GL_FRONT, GL_SPECULAR, color);
+    glDisable(GL_TEXTURE_2D);
     glutSolidSphere(0.05, 100, 100);
+    glEnable(GL_TEXTURE_2D);
     glPopAttrib();
 
     glPopMatrix();

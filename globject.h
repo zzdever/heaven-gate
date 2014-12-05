@@ -305,5 +305,112 @@ private:
 
 
 
+class RingCouple:public ObjectFramework
+{
+public:
+    RingCouple(){ theta=0.; }
+    ~RingCouple(){}
+
+    void Draw(GLenum drawMode = GL_RENDER){
+        SetDrawEnv(drawMode);
+        const int grain = 60;
+        glMatrixMode(GL_MODELVIEW);
+        glEnable(GL_CULL_FACE);
+        GLfloat color[]={0.03516, 0.11765, 0.30078, 0.4};
+        glColor4fv(color);
+        //glMaterialf(GL_FRONT, GL_EMISSION, 100);
+        glPushMatrix();
+        glRotatef(theta, 1.0,0.,0.);
+        glutSolidTorus(0.01,0.5,grain,grain);
+        glPopMatrix();
+        glPushMatrix();
+        glRotatef(theta, 0.,1.0,0.);
+        glutSolidTorus(0.01,0.4,grain,grain);
+        glPopMatrix();
+
+        UnsetDrawEnv();
+
+        theta += 0.5;
+        if(theta >= 360)
+            theta = 0;
+    }
+private:
+    float theta;
+};
+
+
+class ImaxScreen:public ObjectFramework
+{
+public:
+    ImaxScreen(){
+        frame=0.;
+        shift = 0.043;
+        SetEnvelopingDimension(1.0,0.01,0.6);
+    }
+    ~ImaxScreen(){}
+
+    int GetFrameCount(){ return (int)frame; }
+    void Draw(GLenum drawMode = GL_RENDER){
+        SetDrawEnv(drawMode);
+
+        // 16:9 screen
+        glBegin(GL_QUADS);
+        glTexCoord2f(0.+shift,0.); glVertex3f(-0.5,-0.2813,0);
+        glTexCoord2f(1.0+shift,0.); glVertex3f(0.5,-0.2813,0);
+        glTexCoord2f(1.0+shift,1.0); glVertex3f(0.5,0.2813,0);
+        glTexCoord2f(0.+shift,1.0); glVertex3f(-0.5,0.2813,0);
+        glEnd();
+
+        UnsetDrawEnv();
+
+        frame += 0.5;
+        if(frame>=IMAXFRAME)
+            frame = 0.;
+    }
+private:
+    float frame;
+    float shift;
+};
+
+
+class MagicCube:public ObjectFramework
+{
+public:
+    MagicCube(){
+        srand(10);
+        for(int i=0;i<4;i++){
+            for(int j=0;j<4;j++){
+                for(int k=0;k<4;k++){
+                    for(int p=0;p<3;p++){
+                        wiggle[i][j][k][p] = pow(-1,rand())*1.0*(rand()%100)/1000;
+                    }}}}
+    }
+
+    ~MagicCube(){}
+
+    void Draw(GLenum drawMode = GL_RENDER){
+        SetDrawEnv(drawMode);
+
+        glColor3f(0.4,0.4,0.4);
+        for(int i=0;i<4;i++){
+            for(int j=0;j<4;j++){
+                for(int k=0;k<4;k++){
+                    glPushMatrix();
+                    glTranslatef((i-1-0.5)*1.0/4.0+wiggle[i][j][k][0],(j-1-0.5)*1.0/4.0+wiggle[i][j][k][1],(k-1-0.5)*1.0/4.0+wiggle[i][j][k][2]);
+                    glScalef(0.2,0.2,0.2);
+                    glutSolidCube(1.0);
+                    glPopMatrix();
+                }
+            }
+        }
+
+        UnsetDrawEnv();
+    }
+
+private:
+    float wiggle[4][4][4][3];
+};
+
+
 
 #endif // GLOBJECT_H

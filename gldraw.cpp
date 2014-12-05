@@ -70,40 +70,24 @@ void GlAll::redraw(GLenum drawMode)
 
 
     for(int i=0; i<objectList.size(); i++){
-        //DEBUG("drawing "<<objectList.at(i)->GetObjectFrameworkName());
+        if(objectList.at(i)->GetObjectFrameworkName() == "imaxscreen")
+            objectList.at(i)->SetTexture(texImax[static_cast<ImaxScreen*>(objectList.at(i))->GetFrameCount()]);
+
         objectList.at(i)->Draw(drawMode);
     }
 
-//    {
-//        glPushMatrix();
-//        glTranslatef(0.,0.,2.0);
-//        glBindTexture(GL_TEXTURE_2D, texBalcony);
-//        glutSolidTeapot(1.);
-//        glPopMatrix();
-//    }
 
-
-    // global transformationq
+    // global transformation
     glRotatef(fRotate, 0, 1.0f, 0);			// Rotate around Y axis
     glScalef(0.2, 0.2, 0.2);
 
 
-    // draw sky
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
     if(drawMode == GL_RENDER){
-        glEnable(GL_CULL_FACE);
-        glFrontFace(GL_CW);
-        glBindTexture(GL_TEXTURE_2D, texNightSky); // 设置纹理
-        GLUquadricObj *quadricObj;
-        quadricObj = gluNewQuadric(); // 绘制球体
-        gluQuadricNormals(quadricObj, GL_SMOOTH); // 产生光滑
-        gluQuadricTexture(quadricObj, GL_TRUE); // 激活曲面纹理坐标参照
-        gluSphere(quadricObj, 100.0f, 32, 16); // 绘制球体
+        DrawSky();
     }
-    glPopAttrib();
+
 
     if (bAnim) fRotate    += 0.5f;
-
 
     // NOTE QOpenGLContext::swapBuffers() called with non-exposed window, behavior is undefined
     //glutSwapBuffers();
@@ -117,10 +101,21 @@ void GlAll::SetupScene()
     girl->SetObjectFrameworkName("girl");
     objectList.push_back(girl);
 
-    ModelCube* cube = new ModelCube;
-    cube->SetPosition(0.,0.,2.0);
-    cube->SetObjectFrameworkName("cube");
-    objectList.push_back(cube);
+    MagicCube* magicCube = new MagicCube;
+    magicCube->SetPosition(2.0,0.,0.);
+    magicCube->SetObjectFrameworkName("magiccube");
+    objectList.push_back(magicCube);
+
+    RingCouple* ringCouple = new RingCouple;
+    ringCouple->SetPosition(0.,0.,5.0);
+    ringCouple->SetObjectFrameworkName("ringcouple");
+    objectList.push_back(ringCouple);
+
+    ImaxScreen* imaxScreen = new ImaxScreen;
+    imaxScreen->SetPosition(-4,0,2);
+    imaxScreen->SetScale(5);
+    imaxScreen->SetObjectFrameworkName("imaxscreen");
+    objectList.push_back(imaxScreen);
 }
 
 
@@ -167,152 +162,23 @@ void GlAll::DrawCrosshair()
 
 
 
-
-
-// drawBox(), glutWireCube() and glutSolidCube() are
-// functions from the GLUT library(glut_shapes.c).
-// They are modified for texture binding
-void GlAll::drawBox(GLfloat size, GLenum type)
-{
-    static GLfloat tex[2][2][2] =
-    {
-        { {0, 0},
-            {1, 0}},
-        { {0, 1},
-            {1, 1}}
-    };
-
-    static GLfloat n[6][3] =
-    {
-        {-1.0, 0.0, 0.0},
-        {0.0, 1.0, 0.0},
-        {1.0, 0.0, 0.0},
-        {0.0, -1.0, 0.0},
-        {0.0, 0.0, 1.0},
-        {0.0, 0.0, -1.0}
-    };
-    static GLint faces[6][4] =
-    {
-        {0, 1, 2, 3},
-        {3, 2, 6, 7},
-        {7, 6, 5, 4},
-        {4, 5, 1, 0},
-        {5, 6, 2, 1},
-        {7, 4, 0, 3}
-    };
-    GLfloat v[8][3];
-    GLint i;
-
-    v[0][0] = v[1][0] = v[2][0] = v[3][0] = -size / 2;
-    v[4][0] = v[5][0] = v[6][0] = v[7][0] = size / 2;
-    v[0][1] = v[1][1] = v[4][1] = v[5][1] = -size / 2;
-    v[2][1] = v[3][1] = v[6][1] = v[7][1] = size / 2;
-    v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
-    v[1][2] = v[2][2] = v[5][2] = v[6][2] = size / 2;
-
-
-
-    for (i = 5; i >= 0; i--) {
-        glBegin(type);
-
-        glNormal3fv(&n[i][0]);
-
-        // when texture blend is enabled, use glMultiTexCoord2
-        if(texBlend){
-            glMultiTexCoord2f(GL_TEXTURE0,0.0,0.0);
-            glMultiTexCoord2f(GL_TEXTURE1,0.0,0.0);
-        }
-        else{
-            glTexCoord2f(tex[0][0][0], tex[0][0][1]);
-        }
-        glVertex3fv(&v[faces[i][0]][0]);
-
-        if (texBlend) {
-            glMultiTexCoord2f(GL_TEXTURE0,1.0,0.0);
-            glMultiTexCoord2f(GL_TEXTURE1,1.0,0.0);
-        }
-        else{
-            glTexCoord2f(tex[0][1][0], tex[0][1][1]);
-        }
-        glVertex3fv(&v[faces[i][1]][0]);
-
-        if(texBlend){
-            glMultiTexCoord2f(GL_TEXTURE0,1.0,1.0);
-            glMultiTexCoord2f(GL_TEXTURE1,1.0,1.0);
-        }
-        else{
-            glTexCoord2f(tex[1][1][0], tex[1][1][1]);
-        }
-        glVertex3fv(&v[faces[i][2]][0]);
-
-        if (texBlend) {
-            glMultiTexCoord2f(GL_TEXTURE0,0.0,1.0);
-            glMultiTexCoord2f(GL_TEXTURE1,0.0,1.0);
-        }
-        else{
-            glTexCoord2f(tex[1][0][0], tex[1][0][1]);
-        }
-        glVertex3fv(&v[faces[i][3]][0]);
-
-        glEnd();
-    }
-}
-
-
-
-
-
-
-// override the glutSolidCube() function in GLUT library
-void GlAll::glutSolidCube(GLdouble size)
-{
-    drawBox(size, GL_QUADS);
-}
-
-
-
-
 void GlAll::DrawSky()
 {
-
-
-    glEnable(GL_TEXTURE_2D);
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
-    //glCullFace(GL_BACK);
-
-    glPushMatrix();
-    glLoadIdentity();
-
-    glBindTexture(GL_TEXTURE_2D, texNightSky);
-
-    glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-    glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-
-
-    GLfloat xequalzero[] = {1.0, 0.0, 0.0, 0.0};
-
-
-    glTexGenfv(GL_S, GL_OBJECT_PLANE, xequalzero);
-    glTexGenfv(GL_T, GL_OBJECT_PLANE, xequalzero);
-
-
-
-    glEnable(GL_TEXTURE_GEN_S);//启用s坐标的纹理生成
-    glEnable(GL_TEXTURE_GEN_T);//启用s坐标的纹理生成
-
-    glNormal3f(0.f, 0.f, 0.f);
-    //glutSolidSphere(100, 100, 100);
-    gluSphere(gluNewQuadric(), 0.8, 100, 100);
-
-    glPopMatrix();
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texNightSky); // 设置纹理
+    GLUquadricObj *quadricObj;
+    quadricObj = gluNewQuadric(); // 绘制球体
+    gluQuadricNormals(quadricObj, GL_SMOOTH); // 产生光滑
+    gluQuadricTexture(quadricObj, GL_TRUE); // 激活曲面纹理坐标参照
+    gluSphere(quadricObj, 100.0f, 32, 16); // 绘制球体
+    glPopAttrib();
 
     return;
 }
 
-void GlAll::Draw_Triangle() // This function draws a triangle with RGB colors
+void GlAll::Draw_Table() // This function draws a triangle with RGB colors
 {
     glEnable(GL_TEXTURE_2D);
     if (texCus) {
@@ -354,22 +220,30 @@ void GlAll::Draw_Triangle() // This function draws a triangle with RGB colors
 
     glPushMatrix();
     glTranslatef(1.5, 1, 1.5);
-    Draw_Leg();
+    //Draw_Leg();
+    glScalef(1, 1, 3);
+    glutSolidCube(1.0);
     glPopMatrix();
 
     glPushMatrix();
     glTranslatef(-1.5, 1, 1.5);
-    Draw_Leg();
+    //Draw_Leg();
+    glScalef(1, 1, 3);
+    glutSolidCube(1.0);
     glPopMatrix();
 
     glPushMatrix();
     glTranslatef(1.5, -1, 1.5);
-    Draw_Leg();
+    //Draw_Leg();
+    glScalef(1, 1, 3);
+    glutSolidCube(1.0);
     glPopMatrix();
 
     glPushMatrix();
     glTranslatef(-1.5, -1, 1.5);
-    Draw_Leg();
+    //Draw_Leg();
+    glScalef(1, 1, 3);
+    glutSolidCube(1.0);
     glPopMatrix();
 
 
@@ -382,13 +256,6 @@ void GlAll::Draw_Triangle() // This function draws a triangle with RGB colors
         glPopAttrib();
     }
 
-
-}
-
-void GlAll::Draw_Leg()
-{
-    glScalef(1, 1, 3);
-    glutSolidCube(1.0);
 }
 
 

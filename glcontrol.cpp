@@ -570,6 +570,9 @@ void GlAll::glAllInit()
     texBalcony = load_texture(BALCONY);
     glBindTexture(GL_TEXTURE_2D, texBalcony);
     TextureColorkey(255,255,255,20);
+    for(int i=0; i<IMAXFRAME; i++){
+        texImax[i] = load_texture((QString(IMAX)+QString("teximax-")+QString::number(i,10)+QString(".bmp")).toStdString().c_str());
+    }
 
 
     eye[0] = 0;

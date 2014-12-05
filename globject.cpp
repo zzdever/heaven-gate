@@ -25,6 +25,8 @@ ObjectFramework::ObjectFramework()
     en_length = 1.0;
     en_width = 1.0;
     en_height = 1.0;
+
+    texture = 0;
 }
 
 void ObjectFramework::SetEnvelopingDimension(GLfloat p_length, GLfloat p_width, GLfloat p_height){
@@ -104,8 +106,6 @@ void ObjectFramework::SetDrawEnv(GLenum drawMode)
     //scale
     glScalef(length*scaleCoefficient, height*scaleCoefficient, width*scaleCoefficient);
 
-    // texture
-    glBindTexture(GL_TEXTURE_2D, texture);
 
     // draw the framework
     if(isSelected){
@@ -114,6 +114,9 @@ void ObjectFramework::SetDrawEnv(GLenum drawMode)
         glutWireCube(1.0);
         glPopMatrix();
     }
+
+    // texture
+    glBindTexture(GL_TEXTURE_2D, texture);
 
     if(drawMode == GL_SELECT)
         glLoadName(objectFrameworkID);

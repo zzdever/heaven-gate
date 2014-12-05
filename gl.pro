@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     globject.cpp \
     gllight.cpp \
     objfile.cpp \
-    nurbs.cpp
+    nurbs.cpp \
+    misc.cpp
 
 FORMS    += mainwindow.ui
 

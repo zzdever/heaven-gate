@@ -49,17 +49,17 @@ public:
     void change_light(int num, float value[4], LightParam param = Diffuse);
 
     void move(int x, int y, int z){
-        DEBUG("move"<<x<<" "<<y<<" "<<z);
+        DEBUG("move "<<x<<" "<<y<<" "<<z);
         if(selectedObject == NULL) return;
         selectedObject->MovePosition(x/100.0,y/100.0,z/100.0);
     }
     void rotate(int x, int y, int z){
-        DEBUG("rotate"<<x<<" "<<y<<" "<<z);
+        DEBUG("rotate "<<x<<" "<<y<<" "<<z);
         if(selectedObject == NULL) return;
         selectedObject->SetRotation(x/5.0,y/5.0,z/5.0);
     }
     void scale(int s) {
-        DEBUG("scale"<<s);
+        DEBUG("scale "<<s);
         if(selectedObject == NULL) return;
         selectedObject->SetScale(s/100.0);
     }
@@ -91,6 +91,7 @@ private:
     GLuint texCustom;
     GLuint texNightSky;
     GLuint texBalcony;
+    GLuint texImax[IMAXFRAME];
 
     // view control
     float eye[3];
@@ -108,9 +109,6 @@ private:
 
     vector<ObjectFramework*> objectList;
     ObjectFramework* selectedObject;
-    //Girl* girl;
-
-    ModelCube cube;
 
     Nurbs tableLamp;
 
@@ -125,13 +123,8 @@ private:
     void SetupScene();
 
     void DrawCrosshair();
-    void drawBox(GLfloat size, GLenum type);
-    void glutSolidCube(GLdouble size);
     void DrawSky();
-    void Draw_Triangle();
-    void Draw_Leg();
-
-    void Radio();
+    void Draw_Table();
 
 };
 

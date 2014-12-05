@@ -25,6 +25,9 @@
 #define NIGHTSKY "/Users/ying/starskyrecur.bmp"
 #define BALCONY "/Users/ying/balcony.bmp"
 
+#define IMAX "/Users/ying/teximax/"
+#define IMAXFRAME 470
+
 #define OBJ_FILE_GIRL "/Users/ying/Documents/DEV/qt_prj/gl/girl.obj"
 
 //==========================================
@@ -62,6 +65,9 @@ enum LightParam{
     Position = 3
 };
 
+
+// override the glutSolidCube() function in GLUT library
+void glutSolidCube(GLdouble size);
 
 
 #endif // MISC_H
