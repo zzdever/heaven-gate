@@ -103,6 +103,7 @@ void GlAll::SetupScene()
 
     MagicCube* magicCube = new MagicCube;
     magicCube->SetPosition(2.0,0.,0.);
+    magicCube->SetTexture(texCube);
     magicCube->SetObjectFrameworkName("magiccube");
     objectList.push_back(magicCube);
 
@@ -116,6 +117,16 @@ void GlAll::SetupScene()
     imaxScreen->SetScale(5);
     imaxScreen->SetObjectFrameworkName("imaxscreen");
     objectList.push_back(imaxScreen);
+
+    for(int i=0;i<6;i++){
+        ModelPrism *poll = new ModelPrism;
+        poll->SetSideCount(4);
+        poll->SetPosition(10*cos(PI*2/6*i),0,10*sin(PI*2/6*i));
+        poll->SetTexture(texPoll[i]);
+        poll->SetDimension(1,1,1.5);
+        poll->SetObjectFrameworkName("poll");
+        objectList.push_back(poll);
+    }
 }
 
 

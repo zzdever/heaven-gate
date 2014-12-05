@@ -1,7 +1,7 @@
 #ifndef MISC_H
 #define MISC_H
 
-
+#include <QString>
 #include <QDebug>
 
 #include <iostream>
@@ -19,16 +19,22 @@
 //==========================================
 // File path definition
 // You may need to change this to compile
-#define CRACK "/Users/ying/Crack.bmp"
-#define SPOT "/Users/ying/Spot.bmp"
-#define MONET "/Users/ying/Monet.bmp"
-#define NIGHTSKY "/Users/ying/starskyrecur.bmp"
-#define BALCONY "/Users/ying/balcony.bmp"
+#define TEXTUREROOT "/Users/ying/Documents/DEV/qt_prj/gl/images"
 
-#define IMAX "/Users/ying/teximax/"
+#define CRACK (QString(TEXTUREROOT)+QString("/Crack.bmp")).toStdString().c_str()
+#define SPOT (QString(TEXTUREROOT)+QString("/Spot.bmp")).toStdString().c_str()
+#define MONET (QString(TEXTUREROOT)+QString("/Monet.bmp")).toStdString().c_str()
+#define NIGHTSKY (QString(TEXTUREROOT)+QString("/starskyrecur.bmp")).toStdString().c_str()
+#define BALCONY (QString(TEXTUREROOT)+QString("/balcony.bmp")).toStdString().c_str()
+#define CUBE (QString(TEXTUREROOT)+QString("/texcube.bmp")).toStdString().c_str()
+
+#define IMAX (QString(TEXTUREROOT)+QString("/teximax/")).toStdString().c_str()
 #define IMAXFRAME 470
 
-#define OBJ_FILE_GIRL "/Users/ying/Documents/DEV/qt_prj/gl/girl.obj"
+#define POLL (QString(TEXTUREROOT)+QString("/texpoll/")).toStdString().c_str()
+#define POLLCOUNT 6
+
+#define OBJ_FILE_GIRL (QString(TEXTUREROOT)+QString("/girl.obj")).toStdString().c_str()
 
 //==========================================
 
@@ -50,13 +56,6 @@ struct Dimension3f{
     GLfloat height;
 };
 
-enum ObjectType{
-    CUBE = 1,
-    SPHERE = 2,
-    COLUMN = 3,
-    CONE = 4,
-
-};
 
 enum LightParam{
     Ambient = 0,

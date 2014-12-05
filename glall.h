@@ -91,7 +91,9 @@ private:
     GLuint texCustom;
     GLuint texNightSky;
     GLuint texBalcony;
+    GLuint texCube;
     GLuint texImax[IMAXFRAME];
+    GLuint texPoll[POLLCOUNT];
 
     // view control
     float eye[3];
