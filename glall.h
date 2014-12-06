@@ -8,7 +8,7 @@
 #include "gllight.h"
 #include "misc.h"
 #include "nurbs.h"
-
+#include "collision.h"
 
 #define BMP_Header_Length 54
 
@@ -111,6 +111,8 @@ private:
 
     vector<ObjectFramework*> objectList;
     ObjectFramework* selectedObject;
+
+    CollisionDetector collisionDetector;
 
 
     GLuint load_texture(const char* file_name);

@@ -35,6 +35,15 @@ void ObjectFramework::SetEnvelopingDimension(GLfloat p_length, GLfloat p_width, 
     en_height = p_height;
 }
 
+Dimension3f ObjectFramework::GetEnvelopingDimension() const
+{
+    Dimension3f dimension;
+    dimension.length = en_length;
+    dimension.width = en_width;
+    dimension.height = en_height;
+    return dimension;
+}
+
 void ObjectFramework::SetDimension(GLfloat p_length, GLfloat p_width, GLfloat p_height)
 {
     length = p_length;

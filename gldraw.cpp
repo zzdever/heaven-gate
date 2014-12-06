@@ -49,6 +49,7 @@ void GlAll::redraw(GLenum drawMode)
 
     MoveControl();
     MoveEye();
+    collisionDetector.CollisionProcess(objectList, eye);
 
 
     if (bWire) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
@@ -158,8 +159,9 @@ void GlAll::SetupScene()
     Tablelamp* tablelamp = new Tablelamp;
     tablelamp->SetPosition(0,0,-5);
     tablelamp->SetScale(2);
+    tablelamp->SetEnvelopingDimension(2,2,2);
     tablelamp->SetObjectFrameworkName("tablelamp");
-    objectList.push_back(tablelamp);
+    //objectList.push_back(tablelamp);
 
 }
 

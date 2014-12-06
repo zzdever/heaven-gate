@@ -51,10 +51,12 @@ void Window::setMainLayout(Window* parent)
     QGroupBox *objectPropertyGroup = new QGroupBox(objectGroup);
     objectPropertyGroup->setTitle(tr("Object Property"));
 
+    /*
     QComboBox *objectTexture = new QComboBox(objectPropertyGroup);
     // TODO add items
     objectTexture->addItem("crack");
     connect(objectTexture, SIGNAL(currentIndexChanged(int)), glWidgetMain, SLOT(changeTexture(int)));
+    */
 
 
     QSlider *moveXSlider = new QSlider(Qt::Horizontal, objectPropertyGroup);
@@ -106,8 +108,10 @@ void Window::setMainLayout(Window* parent)
 
     QGridLayout *objectPropertyGroupLayout = new QGridLayout(objectPropertyGroup);
     objectPropertyGroupLayout->setColumnStretch(1,2);
+    /*
     objectPropertyGroupLayout->addWidget(new QLabel("Tex"),0,0);
     objectPropertyGroupLayout->addWidget(objectTexture,0,1);
+    */
     objectPropertyGroupLayout->addWidget(new QLabel("MoveX"), 1, 0);
     objectPropertyGroupLayout->addWidget(moveXSlider,1,1);
     objectPropertyGroupLayout->addWidget(new QLabel("MoveY"), 2, 0);
