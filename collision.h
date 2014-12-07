@@ -10,7 +10,7 @@ class CollisionDetector
 {
 public:
     CollisionDetector();
-    CollisionDetector(float start_point[]);
+    CollisionDetector(float x, float y, float z);
 
     void CollisionProcess(vector<ObjectFramework*> objectList, float eye[]);
 

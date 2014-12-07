@@ -11,9 +11,14 @@
 #include "misc.h"
 
 
+//+++++++++++++++++++++++++++
+// This class define all the properties of the objects
+// Any project should inherit this
+//+++++++++++++++++++++++++++
 class ObjectFramework
 {
 private:
+    // used as object id
     static int objectFrameworkCount;
 
 public:
@@ -22,41 +27,51 @@ public:
 
     int GetObjectFrameworkID(){ return objectFrameworkID; }
 
+    // name to find it later
     void SetObjectFrameworkName(std::string name){ objectFrameworkName = name; }
     std::string GetObjectFrameworkName(){ return objectFrameworkName; }
 
+    // object dimension
     void SetDimension(GLfloat p_length, GLfloat p_width, GLfloat p_height);
     Dimension3f GetDimension() const;
+    // framework dimension
     void SetEnvelopingDimension(GLfloat p_length, GLfloat p_width, GLfloat p_height);
     Dimension3f GetEnvelopingDimension() const;
 
+    // scale
     void SetScale(GLfloat coefficient){ scaleCoefficient = coefficient; }
     GLfloat GetScale(){ return scaleCoefficient; }
 
+    // position
     void SetPosition(GLfloat x, GLfloat y, GLfloat z);
     void MovePosition(GLfloat dx, GLfloat dy, GLfloat dz);
-
     Point3f GetPosition() const;
 
+    // rotation
     void SetRotation(int drx, int dry, int drz);
 
+    // texture
     void SetTexture(GLuint tex){ texture = tex; }
     GLuint GetTexture() const{ return texture; }
 
+    // material
     void SetMaterial(GLenum param, const GLfloat* params);
 
+    // selection
     void Select(){ isSelected = true; }
     void Unselect(){ isSelected = false; }
     bool IsSelected(){ return isSelected; }
 
     //bool isInFramework(Point3f point);
 
+    // all inherited class should rewrite this
     virtual void Draw(GLenum drawMode = GL_RENDER) = 0;
 
 protected:
     int objectFrameworkID;
     std::string objectFrameworkName;
 
+    // draw environment
     void SetDrawEnv(GLenum drawMode = GL_RENDER);
     void UnsetDrawEnv();
 
@@ -86,11 +101,11 @@ private:
 };
 
 
+// Girl object
 class Girl:public ObjectFramework
 {
 public:
     Girl(){
-        //Select();
         isFileRead = false;
         SetScale(3.0);
         SetEnvelopingDimension(0.8, 0.2, 1.0);
@@ -115,7 +130,7 @@ private:
 };
 
 
-
+// unit cube
 class ModelCube:public ObjectFramework
 {
 public:
@@ -132,7 +147,7 @@ public:
     }
 };
 
-
+// unit sphere
 class ModelSphere:public ObjectFramework
 {
 public:
@@ -149,7 +164,7 @@ public:
     }
 };
 
-
+// unit cylinder
 class ModelCylinder:public ObjectFramework
 {
 public:
@@ -184,6 +199,7 @@ public:
     }
 };
 
+// unit cone
 class ModelCone:public ObjectFramework
 {
 public:
@@ -212,7 +228,7 @@ public:
 };
 
 
-
+// unit prism
 class ModelPrism:public ObjectFramework
 {
 public:
@@ -257,6 +273,7 @@ private:
     int num;
 };
 
+// unit frustum
 class ModelFrustum:public ObjectFramework
 {
 public:
@@ -306,7 +323,7 @@ private:
 };
 
 
-
+// a counle of concentric rings
 class RingCouple:public ObjectFramework
 {
 public:
@@ -340,7 +357,7 @@ private:
     float theta;
 };
 
-
+// imax sreen
 class ImaxScreen:public ObjectFramework
 {
 public:
@@ -375,6 +392,7 @@ private:
 };
 
 
+// the magic cube
 class MagicCube:public ObjectFramework
 {
 public:
@@ -414,6 +432,7 @@ private:
 };
 
 
+// the gate
 class HeavenGate:public ObjectFramework
 {
 public:
@@ -434,7 +453,7 @@ private:
     float theta;
 };
 
-
+// the table lamp
 class Tablelamp:public ObjectFramework
 {
 public:

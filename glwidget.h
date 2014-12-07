@@ -19,6 +19,7 @@ public:
     explicit GLWidget(QWidget *parent = 0, QGLWidget *shareWidget = 0);
     ~GLWidget();
 
+    // size
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
     void rotateBy(int xAngle, int yAngle, int zAngle);
@@ -28,13 +29,16 @@ signals:
     void clicked();
 
 public slots:
+    // key press event
     void keyPress(QKeyEvent *event);
 
 
 protected:
+    // opengl functions
     void initializeGL();
     void paintGL();
     void resizeGL(int width, int height);
+    // mouse events
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);

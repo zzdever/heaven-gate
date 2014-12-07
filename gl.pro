@@ -35,10 +35,10 @@ SOURCES += main.cpp\
     misc.cpp \
     collision.cpp
 
-FORMS    += mainwindow.ui
+FORMS    +=
 
-RESOURCES += \
-    opengl.qrc
+RESOURCES +=
+
 
 LIBS += -framework glut \
     -framework opengl

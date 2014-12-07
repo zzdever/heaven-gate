@@ -47,8 +47,11 @@ void GlAll::redraw(GLenum drawMode)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();									// Reset The Current Modelview Matrix
 
+    // move smooth
     MoveControl();
+    // move eye
     MoveEye();
+    // collision detection
     collisionDetector.CollisionProcess(objectList, eye);
 
 
@@ -71,6 +74,7 @@ void GlAll::redraw(GLenum drawMode)
     }
 
 
+    // draw all objects
     for(int i=0; i<objectList.size(); i++){
         if(objectList.at(i)->GetObjectFrameworkName() == "imaxscreen")
             objectList.at(i)->SetTexture(texImax[static_cast<ImaxScreen*>(objectList.at(i))->GetFrameCount()]);
@@ -98,28 +102,33 @@ void GlAll::redraw(GLenum drawMode)
 
 void GlAll::SetupScene()
 {
+    // girl
     Girl* girl = new Girl;
     girl->SetPosition(0.,0.,0.);
     girl->SetObjectFrameworkName("girl");
     objectList.push_back(girl);
 
+    // magic cube
     MagicCube* magicCube = new MagicCube;
     magicCube->SetPosition(2.0,0.,0.);
     magicCube->SetTexture(texCube);
     magicCube->SetObjectFrameworkName("magiccube");
     objectList.push_back(magicCube);
 
+    // ring couple
     RingCouple* ringCouple = new RingCouple;
     ringCouple->SetPosition(0.,0.,5.0);
     ringCouple->SetObjectFrameworkName("ringcouple");
     objectList.push_back(ringCouple);
 
+    // imax screen
     ImaxScreen* imaxScreen = new ImaxScreen;
     imaxScreen->SetPosition(-4,0,2);
     imaxScreen->SetScale(5);
     imaxScreen->SetObjectFrameworkName("imaxscreen");
     objectList.push_back(imaxScreen);
 
+    // the 6 polls
     for(int i=0;i<6;i++){
         ModelPrism *poll = new ModelPrism;
         poll->SetSideCount(4);
@@ -132,7 +141,7 @@ void GlAll::SetupScene()
 
     // heaven gate
     {
-        int heavenGateZ = 10;
+        int heavenGateZ = 20;
         ModelCube* doorFrame[3];
         for(int i=0;i<3;i++){
             doorFrame[i] = new ModelCube;
@@ -149,19 +158,19 @@ void GlAll::SetupScene()
         doorFrame[2]->SetDimension(0.1,0.1,1.0);
         doorFrame[2]->SetPosition(0.45,0,heavenGateZ);
 
-//        HeavenGate* heavenGate = new HeavenGate;
-//        heavenGate->SetPosition(0,0,10);
-//        heavenGate->SetEnvelopingDimension(0,0,0);
-//        heavenGate->SetObjectFrameworkName("heavengate");
-//        objectList.push_back(heavenGate);
     }
 
+    // table lamp
     Tablelamp* tablelamp = new Tablelamp;
     tablelamp->SetPosition(0,0,-5);
     tablelamp->SetScale(2);
     tablelamp->SetEnvelopingDimension(2,2,2);
     tablelamp->SetObjectFrameworkName("tablelamp");
-    //objectList.push_back(tablelamp);
+#if TABLELAMP
+    objectList.push_back(tablelamp);
+#endif
+
+
 
 }
 
@@ -173,6 +182,8 @@ void GlAll::DrawCrosshair()
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
+    // use glOrtho to draw, so the crosshair is always in the center
+    // and without perspective deformation
     glOrtho(-wWidth,wWidth,-wHeight,wHeight,-1.0,10);
 
     glMatrixMode(GL_MODELVIEW);
@@ -214,12 +225,16 @@ void GlAll::DrawSky()
     glPushAttrib(GL_ALL_ATTRIB_BITS);
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
-    glBindTexture(GL_TEXTURE_2D, texNightSky); // 设置纹理
+    glBindTexture(GL_TEXTURE_2D, texNightSky);
     GLUquadricObj *quadricObj;
-    quadricObj = gluNewQuadric(); // 绘制球体
-    gluQuadricNormals(quadricObj, GL_SMOOTH); // 产生光滑
-    gluQuadricTexture(quadricObj, GL_TRUE); // 激活曲面纹理坐标参照
-    gluSphere(quadricObj, 100.0f, 32, 16); // 绘制球体
+
+    // draw the sphere
+    quadricObj = gluNewQuadric();
+    // smooth
+    gluQuadricNormals(quadricObj, GL_SMOOTH);
+    // sphere texture
+    gluQuadricTexture(quadricObj, GL_TRUE);
+    gluSphere(quadricObj, 100.0f, 32, 16);
     glPopAttrib();
 
     return;

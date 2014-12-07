@@ -12,10 +12,15 @@ public:
     GlLight();
     ~GlLight(){}
 
+    // turn on/off
     void Switch();
+    // draw the light sphere
     void DrawLight();
+    // set the absolute position
     void SetPosition(float x, float y, float z, float w=1.0);
+    // move a relative position
     void MovePosition(float dx, float dy, float dz, float dw=0.);
+    // set the color
     void SetColor(float r, float g, float b, float a);
 
     /*

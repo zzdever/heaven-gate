@@ -9,6 +9,11 @@
 
 #include <GLUT/glut.h>
 
+// draw the table lamp may result in slack
+#define TABLELAMP 0
+
+#define LIGHT_COUNT 2
+
 
 #define TEST 1
 
@@ -41,7 +46,6 @@
 
 #define PI 3.1415926
 
-#define LIGHT_COUNT 1
 
 
 struct Point3f{

@@ -117,6 +117,7 @@ GLint ObjFileSupport::GenDrawList(){
 //    glMaterialfv(GL_FRONT, GL_SPECULAR, color);
 
 
+    // draw vertices
     for (int i=0; i<f_num; i++) {
         glBegin(GL_TRIANGLES);
         glColor3f(0.78125, 0.70588, 0.49804);

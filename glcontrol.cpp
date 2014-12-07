@@ -4,6 +4,7 @@
 #include <QThread>
 
 
+// do something after selection
 void GlAll::ProcessHits(GLint hits, GLuint buffer[])
 {
     GLuint names, *ptr, minZ, *ptrNames, numberOfNames;
@@ -12,6 +13,7 @@ void GlAll::ProcessHits(GLint hits, GLuint buffer[])
 
     ptr = (GLuint *) buffer;
     minZ = 0xffffffff;
+    // choose the nearest object
     for (int i = 0; i < (int)hits; i++) {
         names = *ptr;
         ptr++;
@@ -26,6 +28,7 @@ void GlAll::ProcessHits(GLint hits, GLuint buffer[])
     DEBUG("The closest hit names are ");
     ptr = ptrNames;
 
+    // find the object ID
     for (int j = 0; j < (int)numberOfNames; j++, ptr++) {
          DEBUG(*ptr);
          for(int k=0; k<(int)objectList.size(); k++){
@@ -42,43 +45,53 @@ void GlAll::ProcessHits(GLint hits, GLuint buffer[])
 
 void GlAll::SelectObject(GLint x, GLint y)
 {
-    GLuint selectBuff[32]={0};//创建一个保存选择结果的数组
+    // buffer to store results
+    GLuint selectBuff[32]={0};
     GLint hits, viewport[4];
 
-    glGetIntegerv(GL_VIEWPORT, viewport); //获得viewport
-    glSelectBuffer(32, selectBuff); //告诉OpenGL初始化  selectbuffer
-    glRenderMode(GL_SELECT);    //进入选择模式
+    // get viewport
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    // initialize buffer
+    glSelectBuffer(32, selectBuff);
+    // enter select mode
+    glRenderMode(GL_SELECT);
 
-    glInitNames();  //初始化名字栈
-    glPushName(0);  //在名字栈中放入一个初始化名字，这里为‘0’
+    // initialize name stack
+    glInitNames();
+    // push a name 0
+    glPushName(0);
 
-    glMatrixMode(GL_PROJECTION);    //进入投影阶段准备拾取
-    glPushMatrix();     //保存以前的投影矩阵
-    glLoadIdentity();   //载入单位矩阵
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
 
     x = viewport[2]/2;
     y = viewport[3]/2;
-    gluPickMatrix(x,                // 设定我们选择框的大小，建立拾取矩阵，就是上面的公式
-                  y,                // viewport[3]保存的是窗口的高度，窗口坐标转换为OpenGL坐标
-                  5,5,              // 选择框的大小为5，5
-                  viewport          // 视口信息，包括视口的起始位置和大小
+    gluPickMatrix(x,
+                  y,                // selection position
+                  5,5,              // selection port 5*5
+                  viewport          // viewport information
                   );
 
 
     float whRatio = (GLfloat)wWidth/(GLfloat)wHeight;
     gluPerspective(45.0f, whRatio,0.1f,100.0f);
 
+    // redraw
     redraw(GL_SELECT);
 
     glMatrixMode(GL_PROJECTION);
-    glPopMatrix();  // 返回正常的投影变换
+    glPopMatrix();
 
-    hits = glRenderMode(GL_RENDER); // 从选择模式返回正常模式,该函数返回选择到对象的个数
+    // return to render mode and get hit count
+    hits = glRenderMode(GL_RENDER);
 
     if(hits > 0){
-        ProcessHits(hits, selectBuff);  //  选择结果处理
+        // do processing
+        ProcessHits(hits, selectBuff);
     }
     else{
+        // unselect all if nothing is selected
         for(int k=0; k<(int)objectList.size(); k++){
             objectList.at(k)->Unselect();
         }
@@ -213,18 +226,16 @@ void GlAll::TextureColorkey(GLubyte r, GLubyte g, GLubyte b, GLubyte threshold)
 {
     GLint width, height;
     GLubyte* pixels = 0;
-    // 获得纹理的大小信息
+    // get texture information
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
-    // 分配空间并获得纹理像素
+    // allocate space
     pixels = (GLubyte*)malloc(width*height*4);
     if( pixels == 0 )
         return;
 
     glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, pixels);
-    // 修改像素中的 Alpha 值
-    // 其中 pixels[i*4], pixels[i*4+1], pixels[i*4+2], pixels[i*4+3]
-    // 分别表示第 i 个像素的蓝、绿、红、Alpha 四种分量,0 表示最小,255 表示最大
+    // modify the alpha channel
     {
         GLint i;
         GLint count = width * height;
@@ -237,7 +248,7 @@ void GlAll::TextureColorkey(GLubyte r, GLubyte g, GLubyte b, GLubyte threshold)
                 pixels[i*4+3] = 255;
         }
     }
-    // 将修改后的像素重新设置到纹理中,释放内存
+    // set texture pixels
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, pixels);
     free(pixels);
 }
@@ -317,11 +328,6 @@ GLuint GlAll::GenerateTex()
 
 
 
-
-
-
-
-
 void GlAll::key(unsigned char k)
 {
     switch(k){
@@ -332,39 +338,42 @@ void GlAll::key(unsigned char k)
     case ' ': {bAnim = !bAnim; break;}
     case 'o': {bWire = !bWire; break;}
 
+    // left
     case 'a': {
         sideAmount = -EYE_STEP_COEFFICIENT;
         break;
     }
+    // right
     case 'd': {
         sideAmount = EYE_STEP_COEFFICIENT;
         break;
     }
+    // forward
     case 'w': {
         zoomAmount = EYE_STEP_COEFFICIENT;
         break;
     }
+    // backward
     case 's': {
         zoomAmount = -EYE_STEP_COEFFICIENT;
         break;
     }
+    // up
     case 'z': {
         updownAmount = EYE_STEP_COEFFICIENT;
         break;
     }
+    // down
     case 'c': {
         updownAmount = -EYE_STEP_COEFFICIENT;
         break;
     }
-        // whether to enable texture blending
+    // whether to enable texture blending
     case 'b':{
         texBlend = !texBlend;
         break;
     }
-    case 'B':{
-        break;
-    }
-        // whether to use custom texture
+    // whether to use custom texture
     case 't':{
         texCus = !texCus;
         break;
@@ -410,6 +419,7 @@ void GlAll::key(unsigned char k)
         isCameraOrbit = !isCameraOrbit;
         if(isCameraOrbit){
             Point3f objp = selectedObject->GetPosition();
+            // calculate orbit radius
             orbitRadius = sqrt(pow(objp.x-eye[0],2) + pow(objp.z-eye[2],2));
         }
         break;
@@ -420,23 +430,18 @@ void GlAll::key(unsigned char k)
 }
 
 
-
-
-
-
-
-
-
-
+// move mouse to move eye center
 void GlAll::mouse_move(int dx, int dy){
 
     eye_center[0] += 1.0*dx/wWidth;
     eye_center[1] -= 1.0*dy/wHeight;
 
+    // direction in x-z plane
     eye_theta[0] += 1.0*dx;
     if(eye_theta[0]*EYE_ROTATION_COEFFICIENT < -360 || eye_theta[0]*EYE_ROTATION_COEFFICIENT > 360)
         eye_theta[0] = 0;
 
+    // direction in vertical plane
     eye_theta[1] += 1.0*dy;
     if(eye_theta[1]*EYE_ROTATION_COEFFICIENT < -90)
         eye_theta[1] = -90*1.0/EYE_ROTATION_COEFFICIENT;
@@ -449,10 +454,12 @@ void GlAll::mouse_move(int dx, int dy){
 
 void GlAll::MoveControl()
 {
+    // pan control
     if(isCameraPan){
         eye_theta[0] += 2.0;
     }
 
+    // orbit control
     if(isCameraOrbit && selectedObject!=NULL){
         Point3f objp = selectedObject->GetPosition();
         eye[0] = objp.x - orbitRadius*sin(eye_theta[0]*EYE_ROTATION_COEFFICIENT/180*PI);
@@ -464,6 +471,7 @@ void GlAll::MoveControl()
     }
 
 
+    // step forward and backward
     if(zoomAmount > ZOOM_THRESHOLD || zoomAmount < -ZOOM_THRESHOLD){
         zoomAmount = zoomAmount*0.8;
         eye[0] += zoomAmount*(eye_center[0] - eye[0]);
@@ -474,6 +482,7 @@ void GlAll::MoveControl()
         QThread::msleep(10);
     }
 
+    // step side
     if(sideAmount > ZOOM_THRESHOLD || sideAmount < -ZOOM_THRESHOLD){
         sideAmount = sideAmount*0.8;
         eye[0] -= sideAmount*(eye_center[2] - eye[2]);
@@ -484,6 +493,7 @@ void GlAll::MoveControl()
         QThread::msleep(10);
     }
 
+    // step up and down
     if(updownAmount > ZOOM_THRESHOLD || updownAmount < -ZOOM_THRESHOLD){
         updownAmount = updownAmount*0.8;
         eye[1] += updownAmount;
@@ -498,7 +508,7 @@ void GlAll::MoveControl()
 
 void GlAll::MoveEye()
 {
-
+    // calculate eye center coordinates
     eye_center[0] = eye[0] + sin(eye_theta[0]*EYE_ROTATION_COEFFICIENT/180*PI);
     eye_center[1] = eye[1] - tan(eye_theta[1]*EYE_ROTATION_COEFFICIENT/180*PI);
     eye_center[2] = eye[2] - cos(eye_theta[0]*EYE_ROTATION_COEFFICIENT/180*PI);
@@ -543,7 +553,6 @@ void GlAll::change_light(int num, float value[], LightParam param)
 
 
 
-// Do not modify the following functions if not necessary
 
 void GlAll::glAllInit()
 {
@@ -562,6 +571,7 @@ void GlAll::glAllInit()
     texBlend = false;
     texCus = false;
 
+    // load textures
     texCrack = load_texture(CRACK);
     texSpot = load_texture(SPOT);
     texMonet = load_texture(MONET);
@@ -582,7 +592,7 @@ void GlAll::glAllInit()
 
     eye[0] = 0;
     eye[1] = 0;
-    eye[2] = 15;
+    eye[2] = 30;
 
     eye_center[0] = 0;
     eye_center[1] = 0;
@@ -674,6 +684,7 @@ vector<GLdouble> GlAll::screen2world(int x, int y)
     GLfloat winX, winY, winZ;
     GLdouble posX, posY, posZ;
 
+    // get matrices
     glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
     glGetDoublev(GL_PROJECTION_MATRIX, projection);
     glGetIntegerv(GL_VIEWPORT, viewport);
@@ -682,6 +693,7 @@ vector<GLdouble> GlAll::screen2world(int x, int y)
     winY = (float)viewport[3] - (float)y;
 
     glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
+    // unproject to get the world coordinates
     gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
     vector<GLdouble> v;

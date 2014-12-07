@@ -23,9 +23,7 @@ void Window::setMainLayout(Window* parent)
     currentGlWidget = glWidgetMain;
 
 
-
-
-
+    // object control group
     QGroupBox *objectGroup = new QGroupBox(parent);
     objectGroup->setFixedWidth(180);
     objectGroup->setTitle(tr("Object Control"));
@@ -140,9 +138,6 @@ void Window::setMainLayout(Window* parent)
 
 
 
-
-
-
     QGroupBox *lightGroup = new QGroupBox(parent);
     lightGroup->setFixedWidth(180);
     lightGroup->setTitle(tr("Light Control"));
@@ -239,11 +234,7 @@ void Window::setMainLayout(Window* parent)
 
 Window::Window()
 {
-
-
     setMainLayout(this);
-
-
 
 //    for (int i = 0; i < NumRows; ++i) {
 //        for (int j = 0; j < NumColumns; ++j) {
@@ -268,7 +259,7 @@ Window::Window()
     connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
     timer->start(20);
 
-    setWindowTitle(tr("Textures"));
+    setWindowTitle(tr("Heaven Gate"));
 }
 
 void Window::setCurrentGlWidget()
